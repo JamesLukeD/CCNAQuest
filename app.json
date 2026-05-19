@@ -34,7 +34,14 @@
     },
     "plugins": [
       "expo-router",
-      "@sentry/react-native/expo"
+      [
+        "@sentry/react-native/expo",
+        {
+          "url": "https://sentry.io/",
+          "project": "react-native",
+          "organization": "subnet-studio-6c"
+        }
+      ]
     ],
     "extra": {
       "router": {},

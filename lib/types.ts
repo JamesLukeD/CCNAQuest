@@ -4,10 +4,7 @@ export type QuestionType =
   | 'mcq'
   | 'tf'
   | 'fill'
-  | 'wordbank'
-  | 'match'
-  | 'cli'
-  | 'topology';
+  | 'wordbank';
 
 export interface BaseQuestion {
   type: QuestionType;
@@ -53,46 +50,12 @@ export interface WordBankQuestion extends BaseQuestion {
   explanation?: string;
 }
 
-export interface MatchPair {
-  left: string;
-  right: string;
-}
-export interface MatchQuestion extends BaseQuestion {
-  type: 'match';
-  question: string;
-  pairs: MatchPair[];
-}
-
-export interface CLIQuestion extends BaseQuestion {
-  type: 'cli';
-  prompt: string;
-  accepted: string[];
-  explanation?: string;
-}
-
-export interface TopologyLabel {
-  id: string;
-  label: string;
-  options: string[];
-  answer: string;
-}
-export interface TopologyQuestion extends BaseQuestion {
-  type: 'topology';
-  question: string;
-  imageUrl?: string;
-  labels: TopologyLabel[];
-  explanation?: string;
-}
-
 export type Question =
   | TeachQuestion
   | MCQQuestion
   | TFQuestion
   | FillQuestion
-  | WordBankQuestion
-  | MatchQuestion
-  | CLIQuestion
-  | TopologyQuestion;
+  | WordBankQuestion;
 
 // ── Lesson / Section / Module ────────────────────────────────
 export interface Lesson {

@@ -7,12 +7,14 @@ import { useStore } from '../lib/store';
 import { warnIfInvalid } from '../lib/validateContent';
 import { BG } from '../lib/theme';
 
-// TODO: Replace DSN with your real Sentry DSN from sentry.io → Settings → Projects → Client Keys
 Sentry.init({
-  dsn: 'https://9f196e8397ae01ba65bff40afa5e4df2@o4511417131335680.ingest.de.sentry.io/4511417154928720',
+  dsn: 'https://b943a61ce94b0b440884e06f714e4f05@o4511417131335680.ingest.de.sentry.io/4511418802241616',
   debug: __DEV__,
-  enabled: !__DEV__,           // Only report in production builds; use console in dev
-  tracesSampleRate: 0.2,       // 20% of sessions traced — adjust after launch
+  enabled: !__DEV__,
+  tracesSampleRate: 0.2,
+  replaysSessionSampleRate: 0.1,
+  replaysOnErrorSampleRate: 1,
+  integrations: [Sentry.mobileReplayIntegration(), Sentry.feedbackIntegration()],
 });
 
 export default function RootLayout() {

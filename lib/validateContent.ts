@@ -118,19 +118,7 @@ function checkQuestion(
       }
       break;
     }
-    case 'match': {
-      if (!q.pairs.length) {
-        issues.push({ code: 'W2', path, message: 'pairs array is empty' });
-      }
-      break;
-    }
-    case 'cli': {
-      if (!q.accepted.length) {
-        issues.push({ code: 'W2', path, message: 'accepted answers array is empty' });
-      }
-      break;
-    }
-    // tf / topology — nothing to cross-check structurally
+    // tf — nothing to cross-check structurally
   }
 }
 
