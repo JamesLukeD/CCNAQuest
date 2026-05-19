@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "CCNA Quest",
-    "slug": "CCNAQuest",
+    "slug": "ccnaquest",
     "version": "1.0.0",
     "scheme": "ccnaquest",
     "orientation": "portrait",
@@ -35,6 +35,13 @@
     "plugins": [
       "expo-router",
       "@sentry/react-native/expo"
-    ]
+    ],
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "f559b24c-97e0-4821-9e4b-5d7d29e0f012"
+      }
+    },
+    "owner": "ccnaquest"
   }
 }
