@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <!-- Three rounded word chips in a row -->
+  <rect x="1" y="8" width="6" height="8" rx="3"/>
+  <rect x="9" y="8" width="6" height="8" rx="3"/>
+  <rect x="17" y="8" width="6" height="8" rx="3"/>
+</svg>

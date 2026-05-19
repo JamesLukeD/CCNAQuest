@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <!-- Central router node -->
+  <circle cx="12" cy="12" r="4"/>
+  <!-- Left arm -->
+  <line x1="2" y1="12" x2="8" y2="12"/>
+  <!-- Right arm -->
+  <line x1="16" y1="12" x2="22" y2="12"/>
+  <!-- Left arrowhead (incoming) -->
+  <polyline points="5,9 2,12 5,15"/>
+  <!-- Right arrowhead (outgoing) -->
+  <polyline points="19,9 22,12 19,15"/>
+</svg>

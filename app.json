@@ -1,30 +1,40 @@
 {
   "expo": {
-    "name": "CCNAQuest",
+    "name": "CCNA Quest",
     "slug": "CCNAQuest",
     "version": "1.0.0",
+    "scheme": "ccnaquest",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
-    "userInterfaceStyle": "light",
+    "userInterfaceStyle": "dark",
     "newArchEnabled": true,
     "splash": {
       "image": "./assets/splash-icon.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#0e1a20"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": false,
+      "bundleIdentifier": "com.cawarden.ccnaquest",
+      "buildNumber": "1"
     },
     "android": {
+      "package": "com.cawarden.ccnaquest",
+      "versionCode": 1,
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
+        "backgroundColor": "#0e1a20"
       },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false
     },
     "web": {
-      "favicon": "./assets/favicon.png"
-    }
+      "favicon": "./assets/favicon.png",
+      "bundler": "metro"
+    },
+    "plugins": [
+      "expo-router",
+      "@sentry/react-native/expo"
+    ]
   }
 }

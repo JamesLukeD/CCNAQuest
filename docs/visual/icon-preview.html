@@ -1,0 +1,250 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>CCNAQuest — App Icon Preview</title>
+    <style>
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        background: #2a2a2a;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+        gap: 48px;
+        padding: 48px;
+        font-family: -apple-system, sans-serif;
+        color: #ccc;
+      }
+
+      h1 {
+        font-size: 14px;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        opacity: 0.5;
+        margin-bottom: -32px;
+      }
+
+      .preview-row {
+        display: flex;
+        align-items: flex-end;
+        gap: 40px;
+      }
+
+      .preview-block {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .preview-block label {
+        font-size: 11px;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        opacity: 0.4;
+      }
+
+      /* ─── The icon canvas ─────────────────────────────── */
+      .icon {
+        position: relative;
+        background: radial-gradient(circle at 50% 55%, #162a38 0%, #0e1a20 72%);
+        overflow: hidden;
+        flex-shrink: 0;
+      }
+
+      .icon.ios {
+        border-radius: 22.5%;
+      } /* Apple icon clip */
+      .icon.android {
+        border-radius: 50%;
+      } /* Android adaptive inner circle */
+      .icon.raw {
+        border-radius: 0;
+      }
+
+      /* Teal glow behind frog */
+      .icon::before {
+        content: "";
+        position: absolute;
+        width: 80%;
+        height: 80%;
+        top: 10%;
+        left: 10%;
+        background: radial-gradient(
+          circle,
+          rgba(28, 176, 246, 0.18) 0%,
+          transparent 65%
+        );
+        border-radius: 50%;
+        pointer-events: none;
+      }
+
+      .icon img {
+        position: absolute;
+        /* Frog fills 72% of canvas width, centred, sits slightly low */
+        width: 72%;
+        left: 14%;
+        /* Push frog down slightly — hat tip should be near top safe area */
+        bottom: -4%;
+        /* Crop lower legs — show head + hat + body, cut at lower belly */
+        object-fit: cover;
+        object-position: top center;
+      }
+
+      /* ─── Sizes ──────────────────────────────────────── */
+      .sz-1024 {
+        width: 256px;
+        height: 256px;
+      } /* rendered at 1/4 for screen */
+      .sz-180 {
+        width: 180px;
+        height: 180px;
+      }
+      .sz-120 {
+        width: 120px;
+        height: 120px;
+      }
+      .sz-60 {
+        width: 60px;
+        height: 60px;
+      }
+      .sz-40 {
+        width: 40px;
+        height: 40px;
+      }
+      .sz-29 {
+        width: 29px;
+        height: 29px;
+      }
+
+      /* ─── Export hint ────────────────────────────────── */
+      .export-box {
+        background: #1a1a1a;
+        border: 1px solid #333;
+        border-radius: 8px;
+        padding: 20px 28px;
+        font-size: 12px;
+        line-height: 1.7;
+        max-width: 520px;
+      }
+      .export-box strong {
+        color: #1cb0f6;
+      }
+      .export-box code {
+        background: #222;
+        padding: 2px 6px;
+        border-radius: 4px;
+        font-size: 11px;
+        color: #aaa;
+      }
+
+      /* ─── Full-size render (hidden, for export) ─────── */
+      #full-size-icon {
+        position: fixed;
+        top: -9999px;
+        left: -9999px;
+        width: 1024px;
+        height: 1024px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>CCNAQuest · App Icon Preview</h1>
+
+    <!-- ── At-size previews ─────────────────────────────── -->
+    <div class="preview-row">
+      <div class="preview-block">
+        <div class="icon ios sz-1024">
+          <img src="../../assets/animations/frog/idle.png" alt="Frog mascot" />
+        </div>
+        <label>iOS — 1024 (shown at 256)</label>
+      </div>
+
+      <div
+        style="
+          display: flex;
+          flex-direction: column;
+          gap: 24px;
+          align-items: center;
+        "
+      >
+        <div class="preview-row">
+          <div class="preview-block">
+            <div class="icon ios sz-180">
+              <img src="../../assets/animations/frog/idle.png" alt="" />
+            </div>
+            <label>iOS @3× · 180</label>
+          </div>
+          <div class="preview-block">
+            <div class="icon ios sz-120">
+              <img src="../../assets/animations/frog/idle.png" alt="" />
+            </div>
+            <label>iOS @2× · 120</label>
+          </div>
+          <div class="preview-block">
+            <div class="icon ios sz-60">
+              <img src="../../assets/animations/frog/idle.png" alt="" />
+            </div>
+            <label>Home · 60</label>
+          </div>
+          <div class="preview-block">
+            <div class="icon ios sz-40">
+              <img src="../../assets/animations/frog/idle.png" alt="" />
+            </div>
+            <label>Search · 40</label>
+          </div>
+          <div class="preview-block">
+            <div class="icon ios sz-29">
+              <img src="../../assets/animations/frog/idle.png" alt="" />
+            </div>
+            <label>Settings · 29</label>
+          </div>
+        </div>
+
+        <div class="preview-row">
+          <div class="preview-block">
+            <div class="icon android sz-120">
+              <img src="../../assets/animations/frog/idle.png" alt="" />
+            </div>
+            <label>Android adaptive</label>
+          </div>
+          <div class="preview-block">
+            <div class="icon raw sz-60">
+              <img src="../../assets/animations/frog/idle.png" alt="" />
+            </div>
+            <label>Raw (no clip)</label>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Export instructions ──────────────────────────── -->
+    <div class="export-box">
+      <strong>To export production icon PNG:</strong><br /><br />
+      1. Open this file in Chrome or Safari<br />
+      2. Right-click the large icon → <em>Inspect</em>, set element size to
+      exactly <code>1024 × 1024</code><br />
+      3. Or use the Puppeteer one-liner below:<br /><br />
+      <code
+        >npx puppeteer-cli screenshot --width 1024 --height 1024
+        icon-preview.html icon.png</code
+      ><br /><br />
+      <strong>Checklist before handing off to App Store Connect:</strong><br />
+      · Hat tip visible within top safe area (80% iOS clip circle) ✓<br />
+      · No text or border baked in ✓<br />
+      · Teal glow behind frog at 15–18% opacity ✓<br />
+      · Background exactly <code>#0e1a20</code> at edges (seamless transition to
+      app) ✓<br /><br />
+      <strong>Android adaptive icon:</strong> Deliver frog-only (transparent bg)
+      as <code>assets/adaptive-icon.png</code>. Background layer =
+      <code>#0e1a20</code> solid in <code>app.json</code>.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,415 @@
+import type { Section } from '../../../lib/types';
+
+export const SECTION_CISCO_IOS: Section = {
+  id: 'cisco-ios',
+  title: 'The Cisco IOS Operating System',
+  icon: '🖥️',
+  unlockAfter: 'host-to-host',
+  lessons: [
+    {
+      id: 's2l1',
+      title: 'Connecting to Cisco Devices',
+      icon: '🔌',
+      questions: [
+        {
+          type: 'teach',
+          title: 'Three Ways to Connect',
+          body: 'You can access the Cisco IOS CLI in three ways:\n\nConsole — Direct physical connection via a rollover cable (RJ-45 to DB-9 or USB). Used for initial setup. No network needed.\n\nTelnet — Remote access over the network. Sends everything in plain text — not secure.\n\nSSH (Secure Shell) — Remote access over the network with encryption. This is the preferred method.\n\nAlways use SSH over Telnet in production. Telnet should only be used in isolated lab environments.',
+        },
+        {
+          type: 'mcq',
+          question: 'Which connection method is used for the initial setup of a Cisco device when no network connectivity exists?',
+          choices: ['SSH', 'Telnet', 'Console', 'SNMP'],
+          answer: 'Console',
+        },
+        {
+          type: 'tf',
+          question: 'Telnet is preferred over SSH in production networks because it is faster.',
+          answer: false,
+          explanation: 'Telnet sends data in plain text, making it a security risk. SSH encrypts all traffic and is the preferred method in production environments.',
+        },
+        {
+          type: 'mcq',
+          question: 'What type of cable is used to connect to a Cisco device via the console port?',
+          choices: ['Straight-through cable', 'Crossover cable', 'Rollover (console) cable', 'Fibre optic cable'],
+          answer: 'Rollover (console) cable',
+        },
+        {
+          type: 'mcq',
+          question: 'Which remote access protocol encrypts its traffic?',
+          choices: ['Telnet', 'HTTP', 'SSH', 'FTP'],
+          answer: 'SSH',
+        },
+        {
+          type: 'tf',
+          question: 'A console connection requires the device to already have a valid IP address configured.',
+          answer: false,
+          explanation: 'Console is a direct physical connection and does not require any network or IP configuration — that is why it is used for initial setup.',
+        },
+      ],
+    },
+    {
+      id: 's2l2',
+      title: 'IOS CLI Modes',
+      icon: '🖥️',
+      questions: [
+        {
+          type: 'teach',
+          title: 'The Three Main CLI Modes',
+          body: 'When you log into a Cisco device you move through different modes:\n\nUser EXEC Mode — Limited commands, read-only. Prompt: Router>\n\nPrivileged EXEC Mode — Full show/debug access. Prompt: Router#\n\nGlobal Configuration Mode — Make changes to the device. Prompt: Router(config)#\n\nThe "#" in the prompt means you are in Privileged EXEC or a config mode. The ">" means User EXEC.',
+        },
+        {
+          type: 'teach',
+          title: 'Navigating Between Modes',
+          body: 'Commands to move between modes:\n\nenable — Move from User EXEC (>) to Privileged EXEC (#)\n\nconfigure terminal — Move from Privileged EXEC to Global Config\n\nexit — Go back one level\n\nend (or Ctrl+Z) — Return directly to Privileged EXEC from any config mode\n\nYou can abbreviate commands: "conf t" instead of "configure terminal", "en" instead of "enable".',
+        },
+        {
+          type: 'mcq',
+          question: 'What does the prompt "Router>" indicate?',
+          choices: ['Global Configuration Mode', 'Privileged EXEC Mode', 'User EXEC Mode', 'Interface Configuration Mode'],
+          answer: 'User EXEC Mode',
+        },
+        {
+          type: 'mcq',
+          question: 'Which command moves you from User EXEC mode to Privileged EXEC mode?',
+          choices: ['configure terminal', 'enable', 'privilege exec', 'sudo'],
+          answer: 'enable',
+        },
+        {
+          type: 'tf',
+          question: 'The "end" command returns you to Global Configuration Mode.',
+          answer: false,
+          explanation: '"end" (or Ctrl+Z) returns you directly to Privileged EXEC Mode from any configuration mode — it skips all the way back.',
+        },
+        {
+          type: 'mcq',
+          question: 'Which command enters Global Configuration Mode from Privileged EXEC?',
+          choices: ['config', 'configure terminal', 'global config', 'enable configure'],
+          answer: 'configure terminal',
+        },
+        {
+          type: 'wordbank',
+          question: 'Order these CLI modes from least to most privileged:',
+          bank: ['Global Config Mode', 'Privileged EXEC Mode', 'User EXEC Mode'],
+          answer: ['User EXEC Mode', 'Privileged EXEC Mode', 'Global Config Mode'],
+        },
+        {
+          type: 'fill',
+          question: 'The keyboard shortcut ________ returns you to Privileged EXEC mode from any config sub-mode.',
+          answer: 'Ctrl+Z',
+        },
+      ],
+    },
+    {
+      id: 's2l3',
+      title: 'IOS Help & Shortcuts',
+      icon: '❓',
+      questions: [
+        {
+          type: 'teach',
+          title: 'Context-Sensitive Help',
+          body: 'The IOS CLI has a powerful built-in help system:\n\n? — Shows all available commands at the current mode\n\nsh? — Shows all commands starting with "sh"\n\nshow ? — Shows all options available after the "show" command\n\nTab — Auto-completes a command if it is unambiguous\n\nYou can abbreviate any command as long as it is unique. "sh run" is the same as "show running-config".',
+        },
+        {
+          type: 'mcq',
+          question: 'What does typing "?" alone at a CLI prompt do?',
+          choices: [
+            'Displays an error',
+            'Shows all available commands at the current mode',
+            'Exits the current mode',
+            'Shows the device hostname',
+          ],
+          answer: 'Shows all available commands at the current mode',
+        },
+        {
+          type: 'tf',
+          question: 'In IOS, you can abbreviate commands as long as the abbreviation is unique.',
+          answer: true,
+          explanation: 'Correct! IOS accepts abbreviated commands as long as they are unambiguous. For example, "en" works for "enable" and "conf t" for "configure terminal".',
+        },
+        {
+          type: 'mcq',
+          question: 'What key auto-completes a partially typed IOS command?',
+          choices: ['Enter', 'Ctrl+C', 'Tab', 'Space'],
+          answer: 'Tab',
+        },
+        {
+          type: 'fill',
+          question: 'Typing "show ?" shows all ________ available after the show command.',
+          answer: 'options',
+        },
+        {
+          type: 'mcq',
+          question: 'Which abbreviated command is equivalent to "show running-config"?',
+          choices: ['sh run', 'show r', 'sh rc', 'sho running'],
+          answer: 'sh run',
+        },
+      ],
+    },
+    {
+      id: 's2l4',
+      title: 'Show Commands',
+      icon: '🔍',
+      questions: [
+        {
+          type: 'teach',
+          title: 'Essential Show Commands',
+          body: 'Show commands let you view the current state of the device (from Privileged EXEC mode):\n\nshow version — IOS version, uptime, hardware info\nshow running-config — Active config currently in RAM\nshow startup-config — Config saved in NVRAM (used on boot)\nshow ip interface brief — Summary of all interfaces + IP + status\nshow interfaces — Detailed stats for all interfaces\nshow ip route — The routing table\n\n"show ip interface brief" is one of the most-used troubleshooting commands — learn it cold!',
+        },
+        {
+          type: 'mcq',
+          question: 'Which command shows a quick summary of all interfaces, their IP addresses, and up/down status?',
+          choices: ['show interfaces', 'show version', 'show ip interface brief', 'show running-config'],
+          answer: 'show ip interface brief',
+        },
+        {
+          type: 'mcq',
+          question: 'Where is the running-config stored?',
+          choices: ['NVRAM', 'Flash', 'RAM', 'ROM'],
+          answer: 'RAM',
+        },
+        {
+          type: 'mcq',
+          question: 'Where is the startup-config stored?',
+          choices: ['RAM', 'Flash', 'ROM', 'NVRAM'],
+          answer: 'NVRAM',
+        },
+        {
+          type: 'tf',
+          question: 'The running-config is automatically saved to NVRAM when you make changes.',
+          answer: false,
+          explanation: 'Changes to the running-config are only in RAM and will be LOST on reload unless you explicitly save with "copy running-config startup-config" or "write memory".',
+        },
+        {
+          type: 'mcq',
+          question: 'Which command shows the IOS software version, uptime, and hardware model?',
+          choices: ['show ip interface brief', 'show version', 'show running-config', 'show hardware'],
+          answer: 'show version',
+        },
+        {
+          type: 'fill',
+          question: 'The command "show ip ________ brief" displays a summary of all interfaces.',
+          answer: 'interface',
+        },
+      ],
+    },
+    {
+      id: 's2l5',
+      title: 'Basic Device Config',
+      icon: '✏️',
+      questions: [
+        {
+          type: 'teach',
+          title: 'Setting a Hostname',
+          body: "The hostname identifies the device in the CLI prompt and in network management tools. Configure it from Global Config mode:\n\nRouter(config)# hostname R1\n\nThe prompt immediately changes to R1(config)#\n\nUse a meaningful hostname like the device's physical location or function: \"SW-FLOOR1\", \"RTR-CORE\".",
+        },
+        {
+          type: 'teach',
+          title: 'Interface Configuration',
+          body: 'To configure an interface, enter its sub-mode from Global Config:\n\nR1(config)# interface GigabitEthernet0/0\nR1(config-if)# ip address 192.168.1.1 255.255.255.0\nR1(config-if)# description Link to SW1\nR1(config-if)# no shutdown\n\nInterfaces are administratively shutdown by default on routers — you must use "no shutdown" to enable them.\n\nSwitches have interfaces up by default. Routers have them down by default.',
+        },
+        {
+          type: 'mcq',
+          question: 'Which command sets the device name shown in the CLI prompt?',
+          choices: ['set name R1', 'hostname R1', 'device-name R1', 'name R1'],
+          answer: 'hostname R1',
+        },
+        {
+          type: 'tf',
+          question: 'Router interfaces are administratively shutdown by default.',
+          answer: true,
+          explanation: 'Correct! On Cisco routers, all interfaces default to "administratively down". You must use "no shutdown" to bring them up. Switches are the opposite — ports are up by default.',
+        },
+        {
+          type: 'mcq',
+          question: 'Which command enables a previously shutdown interface?',
+          choices: ['enable interface', 'interface up', 'no shutdown', 'no admin-down'],
+          answer: 'no shutdown',
+        },
+        {
+          type: 'mcq',
+          question: 'What prompt indicates you are in Interface Configuration Mode?',
+          choices: ['Router>', 'Router#', 'Router(config)#', 'Router(config-if)#'],
+          answer: 'Router(config-if)#',
+        },
+        {
+          type: 'fill',
+          question: 'The command "interface GigabitEthernet0/0" can be abbreviated as "int ________".',
+          answer: 'g0/0',
+        },
+        {
+          type: 'mcq',
+          question: 'Which command adds a human-readable label to an interface?',
+          choices: ['label', 'comment', 'description', 'note'],
+          answer: 'description',
+        },
+      ],
+    },
+    {
+      id: 's2l6',
+      title: 'Securing IOS Access',
+      icon: '🔒',
+      questions: [
+        {
+          type: 'teach',
+          title: 'Securing the Device',
+          body: 'You should always password-protect access to your Cisco devices:\n\nEnable Secret — Protects Privileged EXEC mode. Stored as an MD5 hash.\nR1(config)# enable secret Cisco123\n\nConsole Password — Protects the physical console port.\nR1(config)# line console 0\nR1(config-line)# password Cisco123\nR1(config-line)# login\n\nVTY Password — Protects Telnet/SSH (lines 0–15).\nR1(config)# line vty 0 15\nR1(config-line)# password Cisco123\nR1(config-line)# login\n\nAlways use "enable secret" NOT "enable password" — enable secret is encrypted.',
+        },
+        {
+          type: 'teach',
+          title: 'Encrypting Passwords in Config',
+          body: 'By default, passwords set with "password" commands appear in plain text in the running-config. Use this to encrypt them all:\n\nR1(config)# service password-encryption\n\nThis uses Cisco Type 7 encryption (weak, but better than plain text). The "enable secret" uses MD5 (Type 5) and is always encrypted regardless.\n\nType 7 encryption can be reversed with free tools online. For strong security, use "enable secret" with a strong password.',
+        },
+        {
+          type: 'mcq',
+          question: 'Which command protects Privileged EXEC mode with an encrypted password?',
+          choices: ['enable password Cisco123', 'enable secret Cisco123', 'privilege password Cisco123', 'line vty 0 15'],
+          answer: 'enable secret Cisco123',
+        },
+        {
+          type: 'tf',
+          question: '"enable secret" stores the password in MD5 hash format.',
+          answer: true,
+          explanation: 'Correct! "enable secret" stores the password as an MD5 (Type 5) hash, making it much harder to reverse than the plain-text "enable password".',
+        },
+        {
+          type: 'mcq',
+          question: 'Which line configuration protects Telnet and SSH remote access?',
+          choices: ['line console 0', 'line aux 0', 'line vty 0 15', 'line remote 0 15'],
+          answer: 'line vty 0 15',
+        },
+        {
+          type: 'tf',
+          question: 'The "login" command under a line is required for the password to be enforced.',
+          answer: true,
+          explanation: 'Correct! Setting a password alone is not enough — you must also type "login" to tell IOS to prompt for that password when someone connects.',
+        },
+        {
+          type: 'mcq',
+          question: 'What command encrypts all plain-text passwords currently in the running-config?',
+          choices: ['encrypt passwords all', 'service password-encryption', 'password encrypt service', 'enable encryption'],
+          answer: 'service password-encryption',
+        },
+        {
+          type: 'mcq',
+          question: 'VTY lines 0–15 protect which type of access?',
+          choices: ['Console access', 'Auxiliary access', 'Remote access (Telnet/SSH)', 'SNMP access'],
+          answer: 'Remote access (Telnet/SSH)',
+        },
+      ],
+    },
+    {
+      id: 's2l7',
+      title: 'Saving Configuration',
+      icon: '💾',
+      questions: [
+        {
+          type: 'teach',
+          title: 'Running vs Startup Config',
+          body: 'Cisco devices keep two configurations:\n\nRunning-config — Lives in RAM. This is the active config right now. Lost on reboot if not saved.\n\nStartup-config — Lives in NVRAM. Loaded on boot. Survives power loss.\n\nTo save your changes:\nR1# copy running-config startup-config\n(Abbreviated: copy run start)\n\nAlternatively:\nR1# write memory (or just wr)\n\nIf you reboot without saving, ALL your changes are lost! Make "copy run start" a habit.',
+        },
+        {
+          type: 'mcq',
+          question: 'Which command saves the running configuration to NVRAM?',
+          choices: ['save running-config', 'copy running-config startup-config', 'write startup-config', 'commit running-config'],
+          answer: 'copy running-config startup-config',
+        },
+        {
+          type: 'tf',
+          question: 'The running-config is stored in NVRAM and survives a reboot.',
+          answer: false,
+          explanation: 'The running-config is stored in RAM and is LOST on reboot. The startup-config is in NVRAM and persists across reboots.',
+        },
+        {
+          type: 'mcq',
+          question: 'What is the short form of "copy running-config startup-config"?',
+          choices: ['copy run start', 'save config', 'write run', 'wr mem start'],
+          answer: 'copy run start',
+        },
+        {
+          type: 'fill',
+          question: 'The command "________ memory" (or "wr") is an alternative way to save the configuration.',
+          answer: 'write',
+        },
+        {
+          type: 'mcq',
+          question: 'What happens to the running-config if the router is rebooted without saving?',
+          choices: [
+            'It is automatically saved to NVRAM',
+            'It is merged with the startup-config',
+            'All unsaved changes are lost',
+            'It is stored in Flash memory',
+          ],
+          answer: 'All unsaved changes are lost',
+        },
+        {
+          type: 'tf',
+          question: '"write memory" and "copy running-config startup-config" achieve the same result.',
+          answer: true,
+          explanation: 'Correct! Both commands save the running-config to NVRAM as the startup-config. "write memory" is the older syntax; "copy run start" is the modern IOS way.',
+        },
+      ],
+    },
+    {
+      id: 's2l8',
+      title: 'IOS Review Challenge',
+      icon: '🏆',
+      questions: [
+        {
+          type: 'mcq',
+          question: 'Which connection method is most secure for remote device management?',
+          choices: ['Telnet', 'Console', 'SSH', 'HTTP'],
+          answer: 'SSH',
+        },
+        {
+          type: 'mcq',
+          question: 'What prompt do you see in Global Configuration Mode?',
+          choices: ['Router>', 'Router#', 'Router(config)#', 'Router(config-if)#'],
+          answer: 'Router(config)#',
+        },
+        {
+          type: 'tf',
+          question: 'Router interfaces are up by default and do not need "no shutdown".',
+          answer: false,
+          explanation: 'Router interfaces are administratively down by default. You must issue "no shutdown" to enable them. Switch ports are up by default.',
+        },
+        {
+          type: 'mcq',
+          question: 'Where is the startup-config stored?',
+          choices: ['RAM', 'Flash', 'NVRAM', 'ROM'],
+          answer: 'NVRAM',
+        },
+        {
+          type: 'mcq',
+          question: 'Which command MUST follow "password Cisco123" under a line for the password to take effect?',
+          choices: ['enable', 'activate', 'login', 'start'],
+          answer: 'login',
+        },
+        {
+          type: 'wordbank',
+          question: 'Order these commands to configure and save a hostname:',
+          bank: ['copy run start', 'hostname R1', 'configure terminal', 'enable'],
+          answer: ['enable', 'configure terminal', 'hostname R1', 'copy run start'],
+        },
+        {
+          type: 'mcq',
+          question: 'Which command encrypts all currently plain-text passwords in the config?',
+          choices: ['enable secret', 'service password-encryption', 'password encrypt', 'encrypt all'],
+          answer: 'service password-encryption',
+        },
+        {
+          type: 'tf',
+          question: '"enable secret" is always stored encrypted, regardless of "service password-encryption".',
+          answer: true,
+          explanation: 'Correct! "enable secret" is always stored as an MD5 hash. "service password-encryption" only affects "enable password" and line passwords, applying weaker Type 7 encryption.',
+        },
+        {
+          type: 'mcq',
+          question: "Which command shows a one-line summary of every interface's IP address and status?",
+          choices: ['show interfaces', 'show ip route', 'show ip interface brief', 'show version'],
+          answer: 'show ip interface brief',
+        },
+      ],
+    },
+  ],
+};
