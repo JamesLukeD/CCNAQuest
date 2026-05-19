@@ -9,7 +9,7 @@ import { BG } from '../lib/theme';
 
 // TODO: Replace DSN with your real Sentry DSN from sentry.io → Settings → Projects → Client Keys
 Sentry.init({
-  dsn: 'REPLACE_WITH_YOUR_SENTRY_DSN',
+  dsn: 'https://9f196e8397ae01ba65bff40afa5e4df2@o4511417131335680.ingest.de.sentry.io/4511417154928720',
   debug: __DEV__,
   enabled: !__DEV__,           // Only report in production builds; use console in dev
   tracesSampleRate: 0.2,       // 20% of sessions traced — adjust after launch
