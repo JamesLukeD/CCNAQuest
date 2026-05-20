@@ -73,19 +73,27 @@ function ModuleCard({
               <View style={styles.cardInfo}>
                 <Text style={[styles.modTitle, { color: mod.color }]}>{mod.title}</Text>
                 <Text style={styles.modSub}>{mod.subtitle}</Text>
-                <View style={styles.progTrack}>
-                  <View style={[styles.progFill, {
-                    width: `${Math.round(pct * 100)}%` as any,
-                    backgroundColor: mod.color,
-                  }]} />
-                </View>
+                {totalLessons > 0 && (
+                  <View style={styles.progTrack}>
+                    <View style={[styles.progFill, {
+                      width: `${Math.round(pct * 100)}%` as any,
+                      backgroundColor: mod.color,
+                    }]} />
+                  </View>
+                )}
                 <View style={styles.cardFoot}>
-                  <Text style={styles.chipText}>
-                    {mod.sections.length} topics · {totalLessons} lessons
-                  </Text>
-                  <Text style={[styles.pctBadge, { color: mod.color }]}>
-                    {Math.round(pct * 100)}%
-                  </Text>
+                  {totalLessons === 0 ? (
+                    <Text style={[styles.chipText, { color: MUTED }]}>Coming soon</Text>
+                  ) : (
+                    <>
+                      <Text style={styles.chipText}>
+                        {mod.sections.length} topics · {totalLessons} lessons
+                      </Text>
+                      <Text style={[styles.pctBadge, { color: mod.color }]}>
+                        {Math.round(pct * 100)}%
+                      </Text>
+                    </>
+                  )}
                 </View>
               </View>
               <Animated.Text style={[styles.cardArrow, {
@@ -107,6 +115,8 @@ export default function HomeScreen() {
   const xp        = useStore((s) => s.xp);
   const streak    = useStore((s) => s.streak);
   const hearts    = useStore((s) => s.hearts);
+  const nextHeartAt = useStore((s) => s.nextHeartAt);
+  const checkHeartRefill = useStore((s) => s.checkHeartRefill);
   const lastPlayed                  = useStore((s) => s.lastPlayed);
   const hasLoaded                   = useStore((s) => s.hasLoaded);
   const streakBroken                = useStore((s) => s.streakBroken);
@@ -140,6 +150,25 @@ export default function HomeScreen() {
     if (milestone) setMilestoneModal(true);
   }, [milestone]);
 
+  // Incrementally refill hearts — check every 30 s while the screen is mounted.
+  const [heartCountdown, setHeartCountdown] = useState<string | null>(null);
+  useEffect(() => {
+    const tick = () => {
+      checkHeartRefill();
+      if (nextHeartAt !== null && hearts < MAX_HEARTS) {
+        const msLeft = Math.max(0, nextHeartAt - Date.now());
+        const m = Math.floor(msLeft / 60_000);
+        const s = Math.floor((msLeft % 60_000) / 1000);
+        setHeartCountdown(`${m}:${String(s).padStart(2, '0')}`);
+      } else {
+        setHeartCountdown(null);
+      }
+    };
+    tick();
+    const id = setInterval(tick, 1000);
+    return () => clearInterval(id);
+  }, [nextHeartAt, hearts]);
+
   const floatY = useRef(new Animated.Value(0)).current;
   useEffect(() => {
     Animated.loop(
@@ -166,7 +195,19 @@ export default function HomeScreen() {
     return { pct: done / totalLessons, totalLessons };
   }
 
-  const xpPct = Math.min((xp % MAX_XP) / MAX_XP, 1);
+  const xpPct   = Math.min((xp % MAX_XP) / MAX_XP, 1);
+  const level    = Math.floor(xp / MAX_XP) + 1;
+  const xpInLevel = xp % MAX_XP;
+
+  // XP bar pulse when xp changes
+  const xpPulse = useRef(new Animated.Value(1)).current;
+  useEffect(() => {
+    if (xp === 0) return;
+    Animated.sequence([
+      Animated.spring(xpPulse, { toValue: 1.03, friction: 3, tension: 300, useNativeDriver: ND }),
+      Animated.spring(xpPulse, { toValue: 1,    friction: 4, tension: 200, useNativeDriver: ND }),
+    ]).start();
+  }, [xp]);
 
   // H5: all modules complete
   const allComplete = ALL_MODULES.every((mod) => {
@@ -176,31 +217,50 @@ export default function HomeScreen() {
 
   return (
     <View style={[styles.root, { paddingTop: insets.top }]}>
-      {/* Top bar */}
+      {/* Top bar: hearts + streak only */}
       <View style={styles.topBar}>
         <View style={styles.heartsRow}>
           {Array.from({ length: MAX_HEARTS }).map((_, i) => (
             <Text key={i} style={[styles.heart, i >= hearts && styles.heartDim]}>❤️</Text>
           ))}
         </View>
-        <View style={styles.xpBlock}>
-          <View style={styles.xpTrack}>
-            <LinearGradient
-              colors={['#58cc02', '#1cb0f6']}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 0 }}
-              style={[styles.xpFill, { width: `${xpPct * 100}%` as any }]}
-            />
-          </View>
-          <Text style={styles.xpLabel}>{xp} XP</Text>
-        </View>
+        <View style={{ flex: 1 }} />
         <Text style={styles.streakText}>🔥 {streak}</Text>
       </View>
+
+      {/* XP bar — full-width row below HUD */}
+      <Animated.View style={[styles.xpRow, { transform: [{ scale: xpPulse }] }]}>
+        <View style={styles.xpMeta}>
+          <Text style={styles.xpLevelLabel}>Lvl {level}</Text>
+          <Text style={styles.xpCountLabel}>{xpInLevel} / {MAX_XP} XP</Text>
+        </View>
+        <View style={styles.xpTrack}>
+          <LinearGradient
+            colors={['#58cc02', '#1cb0f6']}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 0 }}
+            style={[styles.xpFill, { width: `${xpPct * 100}%` as any }]}
+          >
+            <View style={styles.xpHighlight} />
+          </LinearGradient>
+        </View>
+      </Animated.View>
 
       {/* P9: Zero-hearts notice */}
       {hearts === 0 && (
         <View style={styles.noHeartsBanner}>
-          <Text style={styles.noHeartsText}>❤️ Out of hearts. Rest until tomorrow, apprentice.</Text>
+          <Text style={styles.noHeartsText}>
+            {heartCountdown
+              ? `❤️ Next heart in ${heartCountdown}`
+              : '❤️ Out of hearts. Hang tight, apprentice.'}
+          </Text>
+        </View>
+      )}
+
+      {/* Refilling hearts nudge */}
+      {hearts > 0 && hearts < MAX_HEARTS && heartCountdown && (
+        <View style={[styles.noHeartsBanner, { backgroundColor: 'transparent', borderColor: BORDER }]}>
+          <Text style={[styles.noHeartsText, { color: MUTED }]}>❤️ Next heart in {heartCountdown}</Text>
         </View>
       )}
 
@@ -219,7 +279,11 @@ export default function HomeScreen() {
         <Modal transparent animationType="fade" visible={milestoneModal}>
           <View style={styles.milestoneOverlay}>
             <View style={styles.milestoneCard}>
-              <Text style={styles.milestoneEmoji}>🔥</Text>
+              <Image
+                source={require('../assets/animations/frog/streak.png')}
+                style={{ width: 96, height: 96, alignSelf: 'center', marginBottom: 8 }}
+                resizeMode="contain"
+              />
               <Text style={styles.milestoneTitle}>{milestone} Day Streak!</Text>
               <Text style={styles.milestoneBody}>
                 {milestone >= 100
@@ -325,16 +389,24 @@ const styles = StyleSheet.create({
     flexDirection: 'row', alignItems: 'center', gap: 10,
     paddingHorizontal: SPACING.screen, paddingVertical: 10,
     backgroundColor: SURFACE_2,
-    borderBottomWidth: 1, borderBottomColor: BORDER,
   },
   heartsRow:  { flexDirection: 'row', gap: 3 },
   heart:      { fontSize: 18 },
   heartDim:   { opacity: 0.2 },
-  xpBlock:    { flex: 1, gap: 4 },
-  xpTrack:    { height: 9, backgroundColor: BORDER, borderRadius: 99, overflow: 'hidden' },
-  xpFill:     { height: '100%', borderRadius: 99 },
-  xpLabel:    { fontSize: 10, color: MUTED, fontWeight: '700', letterSpacing: 0.5 },
   streakText: { fontSize: 16, fontWeight: '800', color: '#ffc800' },
+
+  xpRow: {
+    paddingHorizontal: SPACING.screen, paddingTop: 6, paddingBottom: 10,
+    backgroundColor: SURFACE_2,
+    borderBottomWidth: 1, borderBottomColor: BORDER,
+    gap: 5,
+  },
+  xpMeta: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+  xpLevelLabel: { fontSize: 12, fontWeight: '800', color: '#1cb0f6', letterSpacing: 0.4 },
+  xpCountLabel: { fontSize: 11, fontWeight: '600', color: MUTED },
+  xpTrack:    { height: 16, backgroundColor: BORDER, borderRadius: 99, overflow: 'hidden' },
+  xpFill:     { height: '100%', borderRadius: 99, justifyContent: 'flex-start' },
+  xpHighlight: { position: 'absolute', top: 3, left: 8, right: 8, height: 4, borderRadius: 99, backgroundColor: 'rgba(255,255,255,0.28)' },
 
   content: { paddingHorizontal: SPACING.screen },
 

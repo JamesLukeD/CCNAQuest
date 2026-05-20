@@ -1,11 +1,27 @@
 import { View, Text, Image, StyleSheet } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { BG, MUTED, SPACING } from '../../lib/theme';
+import { BG, MUTED, SPACING, SURFACE_1, BORDER } from '../../lib/theme';
 import { useStore } from '../../lib/store';
 import { ALL_MODULES } from '../../data/modules';
 import { ALL_SECTIONS } from '../../data/sections';
 import { PrimaryButton } from '../../components/PrimaryButton';
+
+function StepDots({ active }: { active: 0 | 1 | 2 }) {
+  return (
+    <View style={dotStyles.row}>
+      {[0, 1, 2].map((i) => (
+        <View key={i} style={[dotStyles.dot, i === active && dotStyles.dotActive]} />
+      ))}
+    </View>
+  );
+}
+
+const dotStyles = StyleSheet.create({
+  row: { flexDirection: 'row', gap: 8, justifyContent: 'center', marginTop: 16 },
+  dot: { width: 8, height: 8, borderRadius: 4, backgroundColor: BORDER },
+  dotActive: { backgroundColor: '#1cb0f6', width: 20 },
+});
 
 export default function OnboardingPath() {
   const router = useRouter();
@@ -29,7 +45,7 @@ export default function OnboardingPath() {
     <View style={[styles.root, { paddingTop: insets.top + 40, paddingBottom: insets.bottom + 32 }]}>
       <View style={styles.frogWrap}>
         <Image
-          source={require('../../assets/animations/frog/idle.png')}
+          source={require('../../assets/animations/frog/pointing.png')}
           style={styles.frog}
           resizeMode="contain"
         />
@@ -38,8 +54,8 @@ export default function OnboardingPath() {
       <Text style={styles.headline}>Your first incantation awaits.</Text>
       <Text style={styles.body}>
         The path begins with the fundamentals — how hosts communicate across networks.{'\n\n'}
-        Short lessons. Spaced repetition. Progress saved automatically.{'\n'}
-        The craft reveals itself one spell at a time.
+        Short lessons. Spaced repetition. The academy remembers every spell you cast.{'\n'}
+        The frog never forgets.
       </Text>
 
       {firstLesson && (
@@ -51,6 +67,7 @@ export default function OnboardingPath() {
 
       <View style={styles.cta}>
         <PrimaryButton label="Start Lesson 1 →" onPress={handleStart} />
+        <StepDots active={2} />
       </View>
     </View>
   );
@@ -75,7 +92,7 @@ const styles = StyleSheet.create({
     lineHeight: 24, marginBottom: 28, maxWidth: 320,
   },
   lessonPill: {
-    backgroundColor: '#0d2030', borderRadius: 14, borderWidth: 1, borderColor: '#1a4060',
+    backgroundColor: SURFACE_1, borderRadius: 14, borderWidth: 1, borderColor: BORDER,
     paddingHorizontal: 20, paddingVertical: 12, alignItems: 'center', marginBottom: 36,
   },
   lessonPillLabel: { fontSize: 10, fontWeight: '800', color: '#1cb0f6', letterSpacing: 1.5, marginBottom: 4 },
