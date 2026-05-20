@@ -16,8 +16,7 @@
     "ios": {
       "supportsTablet": false,
       "bundleIdentifier": "com.cawarden.ccnaquest",
-      "buildNumber": "1",
-      "privacyPolicyUrl": "https://jamesluked.github.io/CCNAQuest/privacy.html"
+      "buildNumber": "1"
     },
     "android": {
       "package": "com.cawarden.ccnaquest",
