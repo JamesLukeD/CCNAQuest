@@ -1,11 +1,10 @@
 import React, { useEffect, useRef } from 'react';
 import {
   View, Text, StyleSheet,
-  Animated, Dimensions, Image, Platform, Alert,
+  Animated, Dimensions, Image, Alert,
 } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import LottieView from 'lottie-react-native';
 import { useStore } from '../lib/store';
 import { ALL_SECTIONS } from '../data/sections';
 import { BG, SURFACE_1, BORDER, MUTED, RADIUS, SPACING } from '../lib/theme';
@@ -90,8 +89,6 @@ export default function ResultScreen() {
   const streak    = useStore((s) => s.streak);
   const completed  = useStore((s) => s.completed);
   const hearts     = useStore((s) => s.hearts);
-  const lottieRef = useRef<LottieView>(null);
-
   // Compute next lesson path
   const nextLessonId = React.useMemo(() => {
     if (!lessonId || lessonId.startsWith('review-')) return null;
@@ -155,25 +152,12 @@ export default function ResultScreen() {
       Animated.spring(frogBounce, { toValue: 1, friction: 4, tension: 160, useNativeDriver: true }),
     ]).start();
 
-    // Lottie on native
-    if (Platform.OS !== 'web' && perfect) {
-      setTimeout(() => lottieRef.current?.play(), 400);
-    }
   }, []);
 
   return (
     <View style={[styles.root, { paddingTop: insets.top + 20, paddingBottom: insets.bottom + 24 }]}>
       {/* Celebration effects */}
       {perfect && <Confetti />}
-      {perfect && Platform.OS !== 'web' && (
-        <LottieView
-          ref={lottieRef}
-          source={require('../assets/animations/celebrate.json')}
-          style={styles.lottieOverlay}
-          loop={false}
-          autoPlay={false}
-        />
-      )}
 
       {/* Streak milestone banner */}
       {isStreakUp && (
@@ -274,10 +258,6 @@ const styles = StyleSheet.create({
     flex: 1, backgroundColor: BG,
     paddingHorizontal: SPACING.screen, alignItems: 'center',
   },
-  lottieOverlay: {
-    position: 'absolute', top: 0, left: 0, right: 0,
-    height: 350, zIndex: 10, pointerEvents: 'none',
-  } as any,
   frogHero: { width: 160, height: 160, marginBottom: 10 },
   headline: {
     fontSize: 38, fontWeight: '900', marginBottom: 6, textAlign: 'center',
