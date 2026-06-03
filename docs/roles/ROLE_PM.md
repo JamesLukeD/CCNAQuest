@@ -1,26 +1,26 @@
 # CCNAQuest — Programme Manager / Chief of Staff Brief
 
-**Date:** 19 May 2026
+**Date:** 20 May 2026
 **Role:** Programme Manager / Chief of Staff
 **Status:** Active — cross-workstream coordination
 
 ---
 
-## Current Launch Readiness: 70%
+## Current Launch Readiness: 82%
 
-| Workstream                  | %    | Status                                                                    |
-| --------------------------- | ---- | ------------------------------------------------------------------------- |
-| Core Engineering            | 99%  | ✅ Complete — all 11 bugs closed, all UX states done                      |
-| UI / Design System          | 95%  | ✅ Stable — no open items                                                 |
-| UX / Flow & Edge States     | 100% | ✅ Complete — all states implemented 19 May 2026                          |
-| Visual Assets               | 52%  | 🔄 Illustrator engaged — icon + 3 frog PNGs pending                       |
-| Content Quality             | ~15% | 🔄 SME in progress — Module 1 under review                                |
-| QA                          | 35%  | 🔴 Awaiting production build + SME ≥80%                                   |
-| Infrastructure / Monitoring | 20%  | 🔄 Sentry wired (DSN placeholder); EAS CLI ready; needs Apple Dev account |
-| Legal / Privacy             | 0%   | 🔴 **Not started — CRITICAL PATH**                                        |
-| App Store                   | 0%   | 🔴 Blocked by legal + icon + Apple Dev account                            |
-| Accessibility               | 0%   | 🔴 Deferred post-TestFlight                                               |
-| Performance                 | 0%   | 🔴 Deferred post-TestFlight                                               |
+| Workstream                  | %    | Status                                                                                      |
+| --------------------------- | ---- | ------------------------------------------------------------------------------------------- |
+| Core Engineering            | 99%  | ✅ Complete — schema v6, incremental heart refill, all 11 bugs closed                       |
+| UI / Design System          | 99%  | ✅ Stable — quiz escape, correct answer reveal, XP bar redesigned (20 May)                  |
+| UX / Flow & Edge States     | 100% | ✅ Complete — all states implemented                                                        |
+| Visual Assets               | 65%  | 🔄 Icon delivered; 3 frog PNGs (`streak`, `perfect`, `pointing`) pending                    |
+| Content Quality             | ~38% | 🔄 Module 1 written (~430 q); Modules 2–4 (27 sections) not yet written; SME review pending |
+| QA                          | 35%  | 🔴 Awaiting production build + SME ≥80%                                                     |
+| Infrastructure / Monitoring | 40%  | 🔄 Sentry live DSN, EAS ready; needs Apple Dev paid tier ($99/yr)                           |
+| Legal / Privacy             | 0%   | 🔴 **Not started — CRITICAL PATH**                                                          |
+| App Store                   | 0%   | 🔴 Blocked by legal + Apple Dev paid tier                                                   |
+| Accessibility               | 0%   | 🔴 Deferred post-TestFlight                                                                 |
+| Performance                 | 0%   | 🔴 Deferred post-TestFlight                                                                 |
 
 ---
 
@@ -114,19 +114,19 @@ All project documents are in `docs/`. These are the live sources of truth:
 
 | Document                             | Purpose                                                              | Last updated |
 | ------------------------------------ | -------------------------------------------------------------------- | ------------ |
-| `docs/pm/PROGRAMME_BRIEF.md`         | Master status dashboard, critical path, 14-day plan                  | 19 May 2026  |
-| `docs/pm/PROJECT_STATUS.md`          | Earlier status snapshot — superseded by PROGRAMME_BRIEF              | 19 May 2026  |
-| `docs/qa/QA_REPORT.md`               | Full bug register (BUG-001–011), 14 test cases, regression checklist | 19 May 2026  |
-| `docs/ux/UX_FLOW_AUDIT.md`           | Full UX spec — all screen states, edge cases, copy                   | 19 May 2026  |
-| `docs/architecture/SYSTEM_DESIGN.md` | Technical architecture reference                                     | May 2026     |
+| `docs/pm/PROGRAMME_BRIEF.md`         | Master status dashboard, critical path, 14-day plan                  | 20 May 2026  |
+| `docs/pm/PROJECT_STATUS.md`          | Earlier status snapshot — superseded by PROGRAMME_BRIEF              | 20 May 2026  |
+| `docs/qa/QA_REPORT.md`               | Full bug register (BUG-001–011), 14 test cases, regression checklist | 20 May 2026  |
+| `docs/ux/UX_FLOW_AUDIT.md`           | Full UX spec — all screen states, edge cases, copy                   | 20 May 2026  |
+| `docs/architecture/SYSTEM_DESIGN.md` | Technical architecture reference                                     | 20 May 2026  |
 | `docs/ui/UI_AUDIT.md`                | Design system, token audit                                           | May 2026     |
-| `docs/visual/VISUAL_STYLE_GUIDE.md`  | Visual spec for illustrator                                          | May 2026     |
-| `docs/roles/ROLE_DEVELOPER.md`       | Developer brief                                                      | 19 May 2026  |
-| `docs/roles/ROLE_ILLUSTRATOR.md`     | Illustrator brief                                                    | 19 May 2026  |
+| `docs/visual/VISUAL_STYLE_GUIDE.md`  | Visual spec for illustrator                                          | 20 May 2026  |
+| `docs/roles/ROLE_DEVELOPER.md`       | Developer brief                                                      | 20 May 2026  |
+| `docs/roles/ROLE_ILLUSTRATOR.md`     | Illustrator brief                                                    | 20 May 2026  |
 | `docs/roles/ROLE_LEGAL.md`           | Legal advisor brief                                                  | 19 May 2026  |
-| `docs/roles/ROLE_SME.md`             | CCNA SME brief                                                       | 19 May 2026  |
-| `docs/roles/ROLE_APP_STORE.md`       | App Store Specialist brief                                           | 19 May 2026  |
-| `docs/roles/ROLE_QA.md`              | QA Engineer brief                                                    | 19 May 2026  |
+| `docs/roles/ROLE_SME.md`             | CCNA SME brief                                                       | 20 May 2026  |
+| `docs/roles/ROLE_APP_STORE.md`       | App Store Specialist brief                                           | 20 May 2026  |
+| `docs/roles/ROLE_QA.md`              | QA Engineer brief                                                    | 20 May 2026  |
 
 ---
 
@@ -143,7 +143,7 @@ If Week 1 goes to plan:
 
 ## Flags to Watch
 
-1. **SME timeline is the longest-lead item.** 37 sections × 10–20 questions each = significant review volume. If Batch 1 is not delivered by Day 7, escalate — this is the critical path.
-2. **Apple Developer account takes 48 hours to activate** after payment. Do not assume it's instant.
+1. **SME timeline is the longest-lead item.** 37 sections × 10–20 questions each = significant review volume. Module 1 is written (~430 questions) but not yet SME-reviewed. Modules 2–4 are still empty. Escalate if Batch 1 review is not delivered by Day 7.
+2. **Apple Developer paid tier ($99/yr) still needed.** Free tier applied. Without the paid membership, no TestFlight and no App Store submission.
 3. **`lottie-react-native` native build** is untested — the first EAS build may surface a compilation failure. The Developer knows this risk.
-4. **Bundle identifier `com.cawarden.ccnaquest`** is a placeholder. Confirm the correct reverse-domain with the Developer before the first EAS build.
+4. **Bundle identifier `com.cawarden.ccnaquest`** is confirmed. Verify against the Apple Developer account once paid tier activates.

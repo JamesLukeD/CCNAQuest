@@ -175,7 +175,9 @@ Files: `assets/icons/module-fundamentals.svg`, `module-routing.svg`, `module-sec
 
 ### 4.1 Concept
 
-The current `assets/icon.png` is a blank placeholder. The app icon must:
+> ✅ **Delivered 20 May 2026** — `assets/icon.png` and `assets/adaptive-icon.png` are in place. Frog on dark purple-teal background, `idle.png` pose, teal glow. No further action needed for App Store submission.
+
+The icon spec that was followed:
 
 1. Immediately read as "tech + magic" at 60×60px (home screen on a device)
 2. Work on both light and dark wallpapers
@@ -330,8 +332,8 @@ Complete checklist of all visual assets. Tick off as each is created.
 
 ### App Shell
 
-- [ ] `assets/icon.png` (1024×1024 — frog on dark bg)
-- [ ] `assets/adaptive-icon.png` (1024×1024 — frog on transparent)
+- [x] `assets/icon.png` (1024×1024 — frog on dark bg) ✅ Delivered 20 May
+- [x] `assets/adaptive-icon.png` (1024×1024 — frog on transparent) ✅ Delivered 20 May
 - [ ] `assets/favicon.png` (64×64 — hat silhouette)
 - [ ] `assets/splash-icon.png` (1284×2778 — full splash)
 

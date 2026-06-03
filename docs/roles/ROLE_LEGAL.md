@@ -1,16 +1,32 @@
 # CCNAQuest — Legal Advisor Brief
 
-**Date:** 19 May 2026
+**Last updated:** 2 June 2026
 **Role:** Legal Advisor
-**Status:** Not yet engaged — **urgent, blocks submission**
+**Status:** Privacy policy drafted (`privacy.html` at project root) — **needs hosting at a live URL. Trademark review not started.**
 
 ---
 
-## Why This Is Urgent
+## Current State
+
+A privacy policy HTML file has been written and exists at `privacy.html` in the project root. It covers:
+
+- No personal data collected
+- Local-only storage (AsyncStorage)
+- Sentry crash reporting disclosure
+- GDPR compliance statement
+- Contact: jamesdaglessbsc@hotmail.com
+- Last updated: 20 May 2026
+
+**What still needs doing:**
+
+1. **Host `privacy.html` at a live, stable URL** — the file exists but is not deployed
+2. **Trademark review of "CCNA Quest"** — not yet completed
+
+---
+
+## Why The URL Is Urgent
 
 Apple requires a **live, publicly accessible privacy policy URL** in every App Store submission — including apps that collect no user data. There is no waiver. Without it, the submission is rejected before any human review.
-
-The app cannot go to TestFlight (internal QA) or the App Store until this URL exists and is reachable. Every day this is not started is a day that delays launch.
 
 ---
 

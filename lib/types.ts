@@ -117,4 +117,6 @@ export interface AppState {
   streakBroken: boolean;
   /** The highest streak milestone (7/14/30/60/100) that has been celebrated. */
   lastStreakMilestoneCelebrated: number;
+  /** Unix timestamp (ms) when the next heart will be restored. Null when full. */
+  nextHeartAt: number | null;
 }

@@ -1,8 +1,8 @@
 # CCNAQuest — CCNA SME Brief
 
-**Date:** 19 May 2026
+**Last updated:** 2 June 2026
 **Role:** CCNA Subject Matter Expert
-**Status:** In progress — Module 1 under review
+**Status:** All 37 sections written across all 4 modules — awaiting SME accuracy review. None reviewed yet.
 
 ---
 
@@ -18,62 +18,62 @@ Your job is to verify that **every factual claim, diagram description, question,
 
 ## The 37 Sections
 
-### Module 1 — Fundamentals (10 sections) — **Under review**
+### Module 1 — Fundamentals (10 sections) — **Written, awaiting SME review**
 
-| Section ID  | Title                       | Status    |
-| ----------- | --------------------------- | --------- |
-| `section1`  | Host-to-Host Communications | In review |
-| `section2`  | Cisco IOS                   | In review |
-| `section3`  | The Transport Layer         | In review |
-| `section4`  | The Network Layer           | In review |
-| `section5`  | IP Address Classes          | In review |
-| `section6`  | Subnetting                  | In review |
-| `section7`  | The Data Link Layer         | In review |
-| `section8`  | The Physical Layer          | In review |
-| `section9`  | Cisco Device Functions      | In review |
-| `section10` | Life of a Packet            | In review |
+| Section ID  | Title                       | Status                 |
+| ----------- | --------------------------- | ---------------------- |
+| `section1`  | Host-to-Host Communications | ⏳ Awaiting SME review |
+| `section2`  | Cisco IOS                   | ⏳ Awaiting SME review |
+| `section3`  | The Transport Layer         | ⏳ Awaiting SME review |
+| `section4`  | The Network Layer           | ⏳ Awaiting SME review |
+| `section5`  | IP Address Classes          | ⏳ Awaiting SME review |
+| `section6`  | Subnetting                  | ⏳ Awaiting SME review |
+| `section7`  | The Data Link Layer         | ⏳ Awaiting SME review |
+| `section8`  | The Physical Layer          | ⏳ Awaiting SME review |
+| `section9`  | Cisco Device Functions      | ⏳ Awaiting SME review |
+| `section10` | Life of a Packet            | ⏳ Awaiting SME review |
 
-### Module 2 — Routing & Switching (14 sections)
+### Module 2 — Routing & Switching (14 sections) — **Written, awaiting SME review**
 
-| Section ID  | Title                        |
-| ----------- | ---------------------------- |
-| `section11` | Troubleshooting Methodology  |
-| `section12` | Router & Switch Basics       |
-| `section13` | Device Management            |
-| `section14` | Routing Fundamentals         |
-| `section15` | Dynamic Routing Protocols    |
-| `section16` | Connectivity Troubleshooting |
-| `section17` | IGP Fundamentals             |
-| `section18` | OSPF                         |
-| `section19` | VLANs                        |
-| `section20` | Inter-VLAN Routing           |
-| `section21` | DHCP                         |
-| `section22` | HSRP                         |
-| `section23` | STP                          |
-| `section24` | EtherChannel                 |
+| Section ID  | Title                        | Status                 |
+| ----------- | ---------------------------- | ---------------------- |
+| `section11` | Troubleshooting Methodology  | ⏳ Awaiting SME review |
+| `section12` | Router & Switch Basics       | ⏳ Awaiting SME review |
+| `section13` | Device Management            | ⏳ Awaiting SME review |
+| `section14` | Routing Fundamentals         | ⏳ Awaiting SME review |
+| `section15` | Dynamic Routing Protocols    | ⏳ Awaiting SME review |
+| `section16` | Connectivity Troubleshooting | ⏳ Awaiting SME review |
+| `section17` | IGP Fundamentals             | ⏳ Awaiting SME review |
+| `section18` | OSPF                         | ⏳ Awaiting SME review |
+| `section19` | VLANs                        | ⏳ Awaiting SME review |
+| `section20` | Inter-VLAN Routing           | ⏳ Awaiting SME review |
+| `section21` | DHCP                         | ⏳ Awaiting SME review |
+| `section22` | HSRP                         | ⏳ Awaiting SME review |
+| `section23` | STP                          | ⏳ Awaiting SME review |
+| `section24` | EtherChannel                 | ⏳ Awaiting SME review |
 
-### Module 3 — Security & Services (9 sections)
+### Module 3 — Security & Services (9 sections) — **Written, awaiting SME review**
 
-| Section ID  | Title                     |
-| ----------- | ------------------------- |
-| `section25` | Switch Security           |
-| `section26` | ACLs                      |
-| `section27` | NAT                       |
-| `section28` | IPv6                      |
-| `section29` | WAN                       |
-| `section30` | Security Threat Landscape |
-| `section31` | Cisco Device Security     |
-| `section32` | Network Device Management |
-| `section33` | QoS                       |
+| Section ID  | Title                     | Status                 |
+| ----------- | ------------------------- | ---------------------- |
+| `section25` | Switch Security           | ⏳ Awaiting SME review |
+| `section26` | ACLs                      | ⏳ Awaiting SME review |
+| `section27` | NAT                       | ⏳ Awaiting SME review |
+| `section28` | IPv6                      | ⏳ Awaiting SME review |
+| `section29` | WAN                       | ⏳ Awaiting SME review |
+| `section30` | Security Threat Landscape | ⏳ Awaiting SME review |
+| `section31` | Cisco Device Security     | ⏳ Awaiting SME review |
+| `section32` | Network Device Management | ⏳ Awaiting SME review |
+| `section33` | QoS                       | ⏳ Awaiting SME review |
 
-### Module 4 — Modern Networking (4 sections)
+### Module 4 — Modern Networking (4 sections) — **Written, awaiting SME review**
 
-| Section ID  | Title                 |
-| ----------- | --------------------- |
-| `section34` | Cloud Computing       |
-| `section35` | Wireless Networking   |
-| `section36` | Network Automation    |
-| `section37` | AI & ML in Networking |
+| Section ID  | Title                 | Status                 |
+| ----------- | --------------------- | ---------------------- |
+| `section34` | Cloud Computing       | ⏳ Awaiting SME review |
+| `section35` | Wireless Networking   | ⏳ Awaiting SME review |
+| `section36` | Network Automation    | ⏳ Awaiting SME review |
+| `section37` | AI & ML in Networking | ⏳ Awaiting SME review |
 
 ---
 
@@ -87,7 +87,7 @@ Each section is in `data/` as a TypeScript file. You do not need to read TypeScr
 - `lessons` — array of lessons, each with:
   - `title` — lesson name
   - `questions` — array of questions, each with:
-    - `type` — `'teach'` (content card), `'mcq'` (multiple choice), `'fill'` (fill in blank), `'order'` (ordering), `'match'` (matching), `'wordbank'` (drag words)
+    - `type` — `'teach'` (content card), `'mcq'` (multiple choice), `'fill'` (fill in blank), `'tf'` (true/false), `'wordbank'` (drag words to fill blanks)
     - `question` — the question text or teach content
     - `options` / `answer` — answer data depending on type
 

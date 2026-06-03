@@ -546,28 +546,236 @@ A lesson containing only `teach` cards passes all of them via `advance()` withou
 
 ---
 
-| #   | Check                                              | How to verify                                                                        |
-| --- | -------------------------------------------------- | ------------------------------------------------------------------------------------ |
-| 1   | App opens to onboarding on first install           | Uninstall, reinstall, launch — onboarding screen 1 must appear                       |
-| 2   | All three onboarding CTAs work                     | Tap through all 3 screens; third screen must launch first quiz                       |
-| 3   | Returning user goes to HomeScreen (not onboarding) | After completing onboarding, force-kill and relaunch — must land on Home             |
-| 4   | HomeScreen HUD shows 5 hearts, XP bar, streak      | Visual check on HomeScreen                                                           |
-| 5   | Tapping a module card opens ModuleScreen           | Tap each of 4 module cards; each opens its sections list                             |
-| 6   | Tapping a section card opens SectionScreen         | Open any section; path with lesson nodes must appear                                 |
-| 7   | MCQ question: correct answer shows green           | Answer correctly — button turns green, frog celebrate appears                        |
-| 8   | MCQ question: wrong answer loses a heart           | Answer incorrectly — HUD heart count decreases by 1, frog incorrect appears          |
-| 9   | Fill question: empty submit shakes the input       | Tap Check with empty field — input shakes, no heart lost                             |
-| 10  | Fill question: correct answer shows green          | Type exact answer, tap Check — input turns green                                     |
-| 11  | Word bank: wrong then retry works                  | Place chips in wrong order — Try Again appears, chips reset, can reattempt           |
-| 12  | Teach card advances without answering              | "Got it →" always active; no heart change; correct count unchanged                   |
-| 13  | Completing a lesson shows ResultScreen             | Finish any lesson — result screen with score stats appears                           |
-| 14  | Result screen: perfect score shows confetti        | Complete a lesson with 0 wrong answers — confetti plays                              |
-| 15  | Result screen: 0 correct shows fizzled copy        | Skip or answer all wrong — "The spell fizzled." headline, no confetti                |
-| 16  | Review XP row hidden                               | Complete a review session — XP row must not appear in stats                          |
-| 17  | Completing a lesson updates module progress bar    | Return to HomeScreen — the module card progress bar must be higher                   |
-| 18  | 0 hearts blocks lesson launch                      | Lose all 5 hearts, tap a lesson node — Alert fires, quiz does NOT open               |
-| 19  | Hearts refill after simulated new day              | Spend hearts, kill app, advance device clock 24h, relaunch — HUD shows 5 hearts      |
-| 20  | Progress persists after app kill                   | Earn XP + complete lessons, force-kill, relaunch — XP and completed status unchanged |
+| #   | Check                                               | How to verify                                                                                                      |
+| --- | --------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
+| 1   | App opens to onboarding on first install            | Uninstall, reinstall, launch — onboarding screen 1 must appear                                                     |
+| 2   | All three onboarding CTAs work                      | Tap through all 3 screens; third screen must launch first quiz                                                     |
+| 3   | Returning user goes to HomeScreen (not onboarding)  | After completing onboarding, force-kill and relaunch — must land on Home                                           |
+| 4   | HomeScreen HUD shows 5 hearts, XP bar, streak       | Visual check on HomeScreen                                                                                         |
+| 5   | Tapping a module card opens ModuleScreen            | Tap each of 4 module cards; each opens its sections list                                                           |
+| 6   | Tapping a section card opens SectionScreen          | Open any section; path with lesson nodes must appear                                                               |
+| 7   | MCQ question: correct answer shows green            | Answer correctly — button turns green, frog celebrate appears                                                      |
+| 8   | MCQ question: wrong answer loses a heart            | Answer incorrectly — HUD heart count decreases by 1, frog incorrect appears                                        |
+| 9   | Fill question: empty submit shakes the input        | Tap Check with empty field — input shakes, no heart lost                                                           |
+| 10  | Fill question: correct answer shows green           | Type exact answer, tap Check — input turns green                                                                   |
+| 11  | Word bank: wrong then retry works                   | Place chips in wrong order — Try Again appears, chips reset, can reattempt                                         |
+| 12  | Teach card advances without answering               | "Got it →" always active; no heart change; correct count unchanged                                                 |
+| 13  | Completing a lesson shows ResultScreen              | Finish any lesson — result screen with score stats appears                                                         |
+| 14  | Result screen: perfect score shows confetti         | Complete a lesson with 0 wrong answers — confetti plays                                                            |
+| 15  | Result screen: 0 correct shows fizzled copy         | Skip or answer all wrong — "The spell fizzled." headline, no confetti                                              |
+| 16  | Review XP row hidden                                | Complete a review session — XP row must not appear in stats                                                        |
+| 17  | Completing a lesson updates module progress bar     | Return to HomeScreen — the module card progress bar must be higher                                                 |
+| 18  | 0 hearts blocks lesson launch                       | Lose all 5 hearts, tap a lesson node — Alert fires, quiz does NOT open                                             |
+| 19  | Hearts refill incrementally (1 per 30 min)          | Spend a heart, note `nextHeartAt`, wait 30 min (or shift device clock) — heart count increases by 1                |
+| 20  | `nextHeartAt` persists across force-kill            | Spend a heart, force-kill, relaunch — heart countdown must still be running (not reset)                            |
+| 21  | Schema v6 migration runs cleanly from v5 save       | Seed a v5 AsyncStorage save (no `nextHeartAt` key), relaunch — app opens normally, `nextHeartAt: null` present     |
+| 22  | Quiz escape (✕) present on all question types       | Open a lesson and step through MCQ, TF, fill, wordbank, teach slide — ✕ button visible in top-left on every screen |
+| 23  | ✕ button returns to SectionScreen without data loss | Tap ✕ mid-quiz — navigates back; no hearts lost, XP unchanged                                                      |
+| 24  | Wrong MCQ reveals correct answer in green           | Answer an MCQ incorrectly — the correct option's button must highlight green                                       |
+| 25  | Wrong TF reveals correct answer in green            | Answer a TF question incorrectly — the correct True/False button must highlight green                              |
+| 26  | Progress persists after app kill                    | Earn XP + complete lessons, force-kill, relaunch — XP and completed status unchanged                               |
+
+---
+
+## Part 4 — Follow-up Audit (20 May 2026)
+
+**Scope:** Post-content-sprint static code review. All 37 section data files now complete. Continue button added to ResultScreen this session. Focused on navigation, game economy, and remaining UX gaps.
+
+---
+
+### BUG-012 — "← Try Again" does not restart the lesson `High`
+
+**File:** `app/result.tsx`, `app/quiz/[lessonId].tsx`
+
+**Root cause:**
+`quiz/[lessonId].tsx` navigates to result via `router.replace('/result')`, which removes the quiz from the navigation stack. The Try Again button calls `router.back()` — but the quiz is gone, so back returns to the **SectionScreen**, not the quiz.
+
+**What happens at runtime:** Player fails a lesson, taps "← Try Again", ends up on the section screen, and must manually re-tap the lesson node. The button label is actively misleading.
+
+**Fix:** Either navigate with `router.push` (not `replace`) so the quiz remains in the stack, or change "Try Again" to `router.replace('/quiz/[lessonId]', { params: { lessonId } })` to re-launch the quiz directly.
+
+---
+
+### BUG-013 — XP awarded on every lesson replay (XP farming) `High`
+
+**File:** `lib/store.ts` — `completeLesson`
+
+**Root cause:**
+`completeLesson` computes `xpEarned` and unconditionally adds it to `state.xp`. The `completed[lessonId]` check only updates the `done`/`perfect` record, but XP is always added regardless of whether the lesson was previously finished.
+
+**What happens at runtime:** Replaying any lesson awards full XP every time. A player can reach max level by replaying lesson 1 repeatedly.
+
+**Fix:** Gate the XP award behind a first-completion check:
+
+```ts
+const isFirstTime = !completed[lessonId];
+const xpEarned = isFirstTime
+  ? wrongCount === 0
+    ? 20
+    : Math.max(5, 10 - wrongCount * 2)
+  : 0;
+const xp = state.xp + xpEarned;
+```
+
+---
+
+### BUG-014 — "Continue →" button bypasses the heart gate `High`
+
+**File:** `app/result.tsx`
+
+**Root cause:**
+The SectionScreen guards lesson navigation with `if (hearts === 0) Alert.alert(...)`. The new "Continue →" button on the ResultScreen navigates directly to the next quiz via `router.replace` with no hearts check.
+
+**What happens at runtime:** A player with 0 hearts can keep playing indefinitely by chaining lessons through the Continue button, bypassing the entire hearts mechanic.
+
+**Fix:** Add the same heart guard in the Continue handler in `result.tsx`:
+
+```ts
+if (hearts === 0) {
+  Alert.alert(
+    "Hearts Spent",
+    "Your hearts are spent. Rest and return tomorrow, apprentice.",
+  );
+  return;
+}
+router.replace({
+  pathname: "/quiz/[lessonId]",
+  params: { lessonId: nextLessonId },
+});
+```
+
+---
+
+### BUG-015 — "First spell cast!" banner shows on every replay of lesson 1 `Medium`
+
+**File:** `app/result.tsx` line ~103
+
+**Root cause:**
+
+```ts
+const isFirstLesson = Object.keys(completed).length === 1;
+```
+
+This evaluates true whenever exactly one lesson is completed in the store. If a player replays their first lesson before completing any other, `completed` still has one key and the banner re-fires.
+
+**Fix:** Track first-completion differently — e.g., check `!prevCompleted[lessonId]` before `completeLesson` is called, or add a dedicated `firstLessonCelebrated` boolean to the store.
+
+---
+
+### BUG-016 — Fill-in-blank: correct answer never shown after a wrong attempt `Medium`
+
+**File:** `app/quiz/[lessonId].tsx` — fill renderer
+
+**Root cause:**
+When `answerState === 'wrong'`, the `QuestionShell` shows the `explanation` field if it exists. But `FillQuestion.explanation` is optional, and the fill renderer never displays `fq.answer` directly. MCQ highlights the correct choice in green; TF highlights the correct button — fill has no equivalent reveal.
+
+**What happens at runtime:** After a wrong fill answer the player sees the input go red and a "fizzled" state, but is never told what the correct answer was. They can only advance blindly.
+
+**Fix:** In the fill renderer, show the answer when wrong:
+
+```tsx
+{
+  answerState === "wrong" && (
+    <Text style={styles.correctAnswerHint}>Correct answer: {fq.answer}</Text>
+  );
+}
+```
+
+---
+
+### BUG-017 — `correctCount` can exceed `total` via wordbank/fill retries `Medium`
+
+**File:** `app/quiz/[lessonId].tsx` — `handleCorrect` / `handleWrong`
+
+**Root cause:**
+On a wordbank or fill retry, the player can answer wrong (incrementing `wrongCount`) and then answer correctly on retry (incrementing `correctCount`). Both counts are incremented for the same question. With 8 questions all retried correctly: `correctCount = 8, wrongCount = 8, total = 8`. The result screen shows `8/8 correct, 8 mistakes`.
+
+**Fix:** Only increment `correctCount` if the question was answered correctly on the **first attempt** (check `firstAttemptRef.current` inside `handleCorrect`).
+
+---
+
+### BUG-018 — `const loaded` reassigned in `loadState()` `Medium`
+
+**File:** `lib/store.ts` lines 52–71
+
+**Root cause:**
+
+```ts
+const loaded = { ...DEFAULT_STATE, ...base };
+loaded = applyHeartRefill(loaded); // ← reassignment to const
+loaded.hearts = MAX_HEARTS; // ← direct mutation
+loaded.streakBroken = true; // ← direct mutation
+```
+
+Reassigning a `const` variable is a JavaScript error. The app functions because Metro/Hermes transpiles `const` to `var` in the bundle. This is a latent reliability issue — a stricter bundler config or future upgrade could surface it as a runtime crash.
+
+**Fix:** Declare as `let`:
+
+```ts
+let loaded = { ...DEFAULT_STATE, ...base };
+```
+
+---
+
+### BUG-019 — Quiz progress bar never reaches 100% `Low`
+
+**File:** `app/quiz/[lessonId].tsx` line ~110
+
+**Root cause:**
+
+```ts
+const progress = qIndex / questions.length;
+```
+
+On the final question (e.g., `qIndex = 9, questions.length = 10`), progress = 90%. The bar never fills because the quiz navigates away at completion rather than rendering a full bar.
+
+**Fix:** Use `(qIndex + 1) / questions.length`, or clamp: `Math.min((qIndex + 1) / questions.length, 1)`.
+
+---
+
+### BUG-020 — Tapping a locked section on ModuleScreen gives no feedback `Low`
+
+**File:** `app/module/[id].tsx` — `TopicCard`
+
+**Root cause:**
+`TopicCard` has `disabled={!unlocked}`, which silently swallows taps. The SectionScreen shows a toast for locked lesson nodes; the ModuleScreen has no equivalent.
+
+**Fix:** Add a press handler for locked state: `if (!unlocked) { /* show toast or Alert */ return; }`.
+
+---
+
+### BUG-021 — Review badge (🔁 N) appears on locked, unplayable lesson nodes `Low`
+
+**File:** `app/section/[id].tsx` — `PathNode`
+
+**Root cause:**
+
+```tsx
+{
+  due > 0 && !isDone && <dueBadge />;
+}
+```
+
+`!isDone` is true for locked nodes. The badge implies the node is actionable for review, but tapping a locked node shows "Locked", not a review session.
+
+**Fix:** Add `&& isUnlocked` to the badge condition.
+
+---
+
+### Summary — Part 4 Bugs
+
+| ID      | Severity | Area         | Status | Description                                       |
+| ------- | -------- | ------------ | ------ | ------------------------------------------------- |
+| BUG-012 | High     | Navigation   | Open   | "Try Again" returns to section, not restarts quiz |
+| BUG-013 | High     | Game economy | Open   | XP farmable by replaying any lesson               |
+| BUG-014 | High     | Hearts       | Open   | Continue button skips heart gate                  |
+| BUG-015 | Medium   | UI           | Open   | "First spell cast" banner shows on replays        |
+| BUG-016 | Medium   | UX           | Open   | Fill wrong answer: correct answer never revealed  |
+| BUG-017 | Medium   | Stats        | Open   | correctCount can exceed total on retries          |
+| BUG-018 | Medium   | Store        | Open   | `const loaded` reassigned — transpiler workaround |
+| BUG-019 | Low      | UI           | Open   | Progress bar never reaches 100%                   |
+| BUG-020 | Low      | UX           | Open   | No feedback when tapping locked section           |
+| BUG-021 | Low      | UI           | Open   | Review badge shown on locked, unplayable nodes    |
 
 ---
 
@@ -580,8 +788,6 @@ The following are documented open items that affect quality but were out of scop
 | `perfect.png` frog asset missing    | UX_FLOW_AUDIT.md P4      | Medium — result screen uses `celebrate.png` as fallback |
 | `streak.png` frog asset missing     | VISUAL_STYLE_GUIDE.md P1 | Medium — milestone modal has no frog                    |
 | `pointing.png` frog asset missing   | VISUAL_STYLE_GUIDE.md P1 | Low — onboarding falls back to `idle.png`               |
-| App icon is a blank placeholder     | VISUAL_STYLE_GUIDE.md §4 | Critical for App Store submission                       |
 | No privacy policy URL               | PROJECT_STATUS.md Risk 2 | Critical for App Store submission                       |
-| No crash/error monitoring           | PROJECT_STATUS.md Risk 3 | High — `_persist()` errors invisible in production      |
 | No accessibility labels (VoiceOver) | PROJECT_STATUS.md Role 6 | High — App Store may require                            |
 | CCNA content accuracy unverified    | PROJECT_STATUS.md Risk 1 | Critical for reputation                                 |

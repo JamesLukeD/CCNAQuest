@@ -1,7 +1,6 @@
 # CCNAQuest — System Design Blueprint
 
-> Last updated: May 2026 — reflects codebase after W2, W5, W11, W12 fixes and full UI token/component refactor (16 violations resolved).  
-> See also: [`docs/ui/UI_AUDIT.md`](../ui/UI_AUDIT.md) · [`docs/visual/VISUAL_STYLE_GUIDE.md`](../visual/VISUAL_STYLE_GUIDE.md) · [`docs/ux/UX_FLOW_AUDIT.md`](../ux/UX_FLOW_AUDIT.md)
+> Last updated: 2 June 2026 — all 11 bugs fixed, schema v6, all 37 sections written, all assets delivered. Active gaps: 2 TS errors in quiz screen, privacy policy not hosted, accessibility at 0%, no production build yet.
 
 ---
 
@@ -98,8 +97,9 @@ _layout.tsx mounts
   → loadState()
       → AsyncStorage.getItem('ccna_quest_v3')
       → JSON.parse
-      → migrate(raw)          ← strips _v, applies any upgrade blocks, fills DEFAULT_STATE gaps
-      → set(migratedState)    → Zustand
+      → migrate(raw)          ← strips _v, applies upgrade blocks (including v5→v6: nextHeartAt), fills DEFAULT_STATE gaps
+      → applyHeartRefill()   ← credits any hearts earned since last session (1 per 30 min)
+      → set(migratedState)   → Zustand
   → if (__DEV__) warnIfInvalid()
       → validateContent()     ← checks all 37 sections + module refs
       → console.warn() on any issue
@@ -145,9 +145,9 @@ key = "[lessonId]:[originalQuestionIndex]"
 Any store mutation
   → _persist(state)
   → AsyncStorage.setItem('ccna_quest_v3',
-      JSON.stringify({ _v: 4, xp, streak, hearts, lastPlayed, completed, sm2 })
+      JSON.stringify({ _v: 6, xp, streak, hearts, nextHeartAt, lastPlayed, completed, sm2 })
     )
-    ← fire-and-forget, errors silently swallowed
+    ← errors logged via Sentry.captureException + console.error
 ```
 
 ### SM-2 Review Flow
@@ -186,9 +186,9 @@ SectionScreen: getDueCount(sm2, section) > 0  →  shows ReviewNode
 
 **Content as Code** — All 37 sections and their lessons live as typed TypeScript constants compiled into the bundle. Zero network dependency; zero CMS.
 
-**Zustand Command Store** — All state mutations are named actions (`completeLesson`, `loseHeart`, `updateSM2`). Components never mutate state directly. Mirrors the Command pattern.
+**Zustand Command Store** — All state mutations are named actions (`completeLesson`, `loseHeart`, `updateSM2`, `checkHeartRefill`). Components never mutate state directly. Mirrors the Command pattern.
 
-**Discriminated Union / Strategy** — `Question` is a tagged union (`type: 'mcq' | 'tf' | 'fill' | 'wordbank' | 'match' | 'cli' | 'topology' | 'teach'`). `QuizScreen` switches on `q.type` to select the renderer. New question types require only a union extension and a new case — open/closed principle holds.
+**Discriminated Union / Strategy** — `Question` is a tagged union (`type: 'mcq' | 'tf' | 'fill' | 'wordbank' | 'teach'`). `QuizScreen` switches on `q.type` to select the renderer. The exhaustive `never` assertion (BUG-009 fix) catches any unhandled type at compile time.
 
 **Factory Function** — `buildReviewLesson()` constructs a virtual `Lesson` at runtime from due SM-2 cards, structurally identical to a static lesson so `QuizScreen` requires no special handling.
 
@@ -198,7 +198,9 @@ SectionScreen: getDueCount(sm2, section) > 0  →  shows ReviewNode
 
 **ND (Native Driver) guard** — `const ND = Platform.OS !== 'web'` constant used app-wide to safely toggle `useNativeDriver`, since the web renderer only supports a subset of animated properties.
 
-**Versioned Migration Runner** — `migrate(raw)` in `store.ts` reads `raw._v` (defaults to 3 for legacy saves), applies sequential `if (version < N)` upgrade blocks, then spreads into `DEFAULT_STATE` to guarantee all fields are present regardless of save age.
+**Versioned Migration Runner** — `migrate(raw)` in `store.ts` reads `raw._v` (defaults to 3 for legacy saves), applies sequential `if (version < N)` upgrade blocks up to the current `SCHEMA_VERSION = 6`, then spreads into `DEFAULT_STATE` to guarantee all fields are present regardless of save age.
+
+**Incremental Heart Refill** — `applyHeartRefill()` is a pure helper that takes any `{ hearts, nextHeartAt }` state and returns it with all hearts owed since `nextHeartAt` credited (1 per 30 min). Called by `loadState()`, `checkHeartRefill()`, and indirectly by `loseHeart()`. `HomeScreen` calls `checkHeartRefill()` on a 1-second interval and shows a live countdown.
 
 ---
 

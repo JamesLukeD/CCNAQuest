@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import { ScrollView, View, Text, Pressable, StyleSheet, Animated, Platform, Image } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useLocalSearchParams, useRouter } from 'expo-router';
@@ -14,9 +14,9 @@ import { HeroPill, HeroProgressBar } from '../../components/HeroPill';
 
 const ND = Platform.OS !== 'web';
 
-function TopicCard({ sec, sId, unlocked, mastered, pct, dueCount, color, onPress }: {
+function TopicCard({ sec, sId, unlocked, mastered, pct, dueCount, color, onPress, onLockedPress }: {
   sec: any; sId: string; unlocked: boolean; mastered: boolean;
-  pct: number; dueCount: number; color: string; onPress: () => void;
+  pct: number; dueCount: number; color: string; onPress: () => void; onLockedPress: () => void;
 }) {
   const scale = useRef(new Animated.Value(1)).current;
 
@@ -24,15 +24,17 @@ function TopicCard({ sec, sId, unlocked, mastered, pct, dueCount, color, onPress
   const hoverOut = () => Animated.spring(scale, { toValue: 1,    friction: 8, tension: 200, useNativeDriver: ND }).start();
 
   const statusColor = mastered ? '#58cc02' : unlocked ? color : '#2a3a4a';
-  const cardBorder  = mastered ? '#58cc02' : unlocked ? color + '55' : '#1e2d3a';
+  const cardBorder  = mastered ? '#58cc0288' : unlocked ? color + '55' : '#1e2d3a';
 
   return (
     <Animated.View style={[styles.topicShell, { transform: [{ scale }], borderColor: cardBorder }]}>
       <Pressable
-        onPress={() => unlocked && onPress()}
+        onPress={() => {
+          if (unlocked) onPress();
+          else onLockedPress();
+        }}
         onHoverIn={hoverIn}
         onHoverOut={hoverOut}
-        disabled={!unlocked}
         style={[styles.topicCard, !unlocked && styles.topicLocked]}
       >
         {/* Left accent */}
@@ -43,6 +45,7 @@ function TopicCard({ sec, sId, unlocked, mastered, pct, dueCount, color, onPress
           <View style={[styles.topicIconWrap, {
             backgroundColor: statusColor + '22',
             borderColor: statusColor + '55',
+            opacity: unlocked ? 1 : 0.4,
           }]}>
             <Text style={styles.topicIconText}>
               {unlocked ? sec.icon : '🔒'}
@@ -67,11 +70,11 @@ function TopicCard({ sec, sId, unlocked, mastered, pct, dueCount, color, onPress
 
           {/* Right badge */}
           {mastered ? (
-            <View style={[styles.badgeWrap, { backgroundColor: '#58cc0222', borderColor: '#58cc02' }]}>
-              <Text style={[styles.badgeText, { color: '#58cc02' }]}>✓</Text>
+            <View style={[styles.badgeWrap, { backgroundColor: color + '22', borderColor: color }]}>
+              <Text style={[styles.badgeText, { color }]}>✓</Text>
             </View>
           ) : unlocked && sec.lessons.length > 0 ? (
-            <Text style={[styles.pctLabel, { color }]}>{Math.round(pct * 100)}%</Text>
+            <Text style={[styles.pctLabel, { color: mastered ? '#58cc02' : color }]}>{Math.round(pct * 100)}%</Text>
           ) : null}
         </View>
       </Pressable>
@@ -85,6 +88,12 @@ export default function ModuleScreen() {
   const insets  = useSafeAreaInsets();
   const completed = useStore((s) => s.completed);
   const sm2 = useStore((s) => s.sm2);
+  const [lockedToast, setLockedToast] = useState(false);
+
+  function showLockedToast() {
+    setLockedToast(true);
+    setTimeout(() => setLockedToast(false), 2200);
+  }
 
   const mod = ALL_MODULES.find((m) => m.id === id);
   if (!mod) {
@@ -141,8 +150,9 @@ export default function ModuleScreen() {
   const isModuleMastered = mod.sections.length > 0 && mod.sections.every((sId) => isSectionMastered(sId));
 
   return (
+    <View style={styles.root}>
     <ScrollView
-      style={styles.root}
+      style={styles.scrollView}
       contentContainerStyle={{ paddingBottom: insets.bottom + 32 }}
       showsVerticalScrollIndicator={false}
     >
@@ -204,11 +214,21 @@ export default function ModuleScreen() {
               dueCount={dueCount}
               color={mod.color}
               onPress={() => router.push(`/section/${sId}`)}
+              onLockedPress={showLockedToast}
             />
           );
         })}
       </View>
     </ScrollView>
+
+    {lockedToast && (
+      <View style={styles.lockedToast} pointerEvents="none">
+        <Text style={styles.lockedToastText}>
+          🔒 Complete the previous topic to unlock this one.
+        </Text>
+      </View>
+    )}
+    </View>
   );
 }
 
@@ -271,4 +291,17 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16, paddingVertical: 10, alignItems: 'center',
   },
   masteredBannerText: { fontSize: 14, fontWeight: '800', letterSpacing: 0.5, textAlign: 'center' },
+
+  // Locked toast
+  lockedToast: {
+    position: 'absolute', bottom: 40, alignSelf: 'center',
+    backgroundColor: '#1a2d3e', borderRadius: 20,
+    paddingHorizontal: 20, paddingVertical: 12,
+    borderWidth: 1, borderColor: '#2a4a60',
+    shadowColor: '#000', shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.4, shadowRadius: 8, elevation: 8,
+  },
+  lockedToastText: { fontSize: 14, fontWeight: '700', color: '#daeaf5' },
+
+  scrollView: { flex: 1 },
 });

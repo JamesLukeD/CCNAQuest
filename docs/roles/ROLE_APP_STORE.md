@@ -1,21 +1,21 @@
 # CCNAQuest — App Store Specialist Brief
 
-**Date:** 19 May 2026
+**Last updated:** 2 June 2026
 **Role:** App Store Specialist
-**Status:** Not yet engaged — engage after legal delivers privacy policy URL
+**Strategy:** Android (Google Play) first — iOS App Store to follow as v1.1
 
 ---
 
 ## Engagement Trigger
 
-Do not begin App Store Connect setup until:
+Do not begin Google Play Console setup until:
 
-1. ✅ Bundle identifier confirmed: `com.cawarden.ccnaquest`
-2. 🔴 Privacy policy is live at a public URL (Legal Advisor — in progress)
-3. 🔴 App icon 1024×1024 PNG delivered (Illustrator — in progress)
-4. 🔴 Apple Developer Program membership active (Developer — pending enrolment)
+1. ✅ Package name confirmed: `com.cawarden.ccnaquest`
+2. ✅ App icon 512×512 PNG available (`assets/icon.png` — done, resize needed)
+3. ✅ Privacy policy live at `https://jamesluked.github.io/CCNAQuest/privacy.html`
+4. ✅ Google Play Developer account registered
 
-Once all four are true, you can proceed with the full setup below.
+Once all four are true, proceed below.
 
 ---
 
@@ -24,47 +24,46 @@ Once all four are true, you can proceed with the full setup below.
 **Name:** CCNAQuest
 **Category:** Education
 **Primary audience:** Adults preparing for the Cisco CCNA 200-301 certification exam
-**Platform:** iOS first, Android to follow
+**Platform:** Android (Google Play) — iOS to follow
 **Monetisation:** Free (v1.0 — no in-app purchases, no subscriptions)
-**Age rating:** 4+ (no objectionable content, no user-generated content)
+**Content rating:** Everyone (no objectionable content, no user-generated content)
 **Supported languages:** English only (v1.0)
 **Offline:** Fully offline. Zero network calls except Sentry crash reporting.
 
 ---
 
-## App Store Connect Setup Checklist
+## Google Play Console Setup Checklist
 
 ### 1. Create the app record
 
-- Sign in to [appstoreconnect.apple.com](https://appstoreconnect.apple.com)
-- New App → iOS
-- **Bundle ID:** `com.cawarden.ccnaquest` — must match exactly what the Developer registers with Apple
-- **SKU:** `ccnaquest-ios-v1` (internal only, never shown to users)
-- **Name:** `CCNAQuest` _(confirm whether Apple permits this — "CCNA" is a Cisco trademark; Legal's recommendation will determine final name)_
-- **Primary language:** English (UK) or English (US) — confirm preference with Programme Manager
+- Sign in to [play.google.com/console](https://play.google.com/console)
+- **Create app** → Free → App → English (UK or US — confirm with PM)
+- **Package name:** `com.cawarden.ccnaquest` — must match exactly what is in `app.json`
+- Declare: app is free, does not target children primarily
 
-### 2. App information
+### 2. Store listing
 
-| Field              | Value                                                                                                     |
-| ------------------ | --------------------------------------------------------------------------------------------------------- |
-| Subtitle           | "Master networking, one spell at a time"                                                                  |
-| Category           | Education                                                                                                 |
-| Secondary category | Reference                                                                                                 |
-| Content rights     | Do you have rights to all content? Yes (with trademark disclaimer — see Legal brief)                      |
-| Age rating         | Complete the questionnaire: no violence, no adult content, no gambling, no user data → will resolve to 4+ |
+| Field              | Value                                                                              |
+| ------------------ | ---------------------------------------------------------------------------------- |
+| App name           | `CCNAQuest`                                                                        |
+| Short description  | `Study for your CCNA with lessons, quizzes, and spaced repetition.` (80 chars max) |
+| Full description   | See draft below (4000 chars max)                                                   |
+| App icon           | 512×512px PNG — resize `assets/icon.png`                                           |
+| Feature graphic    | 1024×500px JPG or PNG — full-bleed banner (needs creating)                         |
+| Category           | Education                                                                          |
+| Email              | jamesdaglessbsc@hotmail.com                                                        |
+| Privacy policy URL | `https://jamesluked.github.io/CCNAQuest/privacy.html`                              |
 
-### 3. App Store listing copy
+**Full description draft:**
 
-**Description (4000 chars max):**
-
-> _Draft for review — Legal must approve the Cisco trademark disclaimer before finalising._
+> _Legal must approve the Cisco trademark disclaimer before finalising._
 
 CCNAQuest turns the Cisco CCNA 200-301 syllabus into a structured, gamified learning path. Study 37 topics across networking fundamentals, routing and switching, security, and modern networking — one lesson at a time.
 
 **How it works:**
 
 - Work through lessons in order, each one building on the last
-- Answer multiple choice, fill-in-the-blank, and word-ordering questions
+- Answer multiple choice, fill-in-the-blank, true/false, and word-bank questions
 - Earn XP for every completed lesson — perfect scores earn bonus points
 - Protect your Hearts — lose one for each wrong answer, they refill daily
 - Build a study Streak — study every day to keep the flame burning
@@ -75,25 +74,14 @@ Subnetting, OSPF, VLANs, Inter-VLAN routing, ACLs, NAT, STP, EtherChannel, HSRP,
 
 _CCNAQuest is an independent study aid. CCNA is a registered trademark of Cisco Systems, Inc. CCNAQuest is not affiliated with or endorsed by Cisco._
 
----
+### 3. Screenshots
 
-**Keywords (100 chars max, comma-separated):**
-`CCNA,networking,Cisco,certification,subnetting,study,flashcards,quiz,OSPF,routing,switching`
+Google Play requires a minimum of 2 phone screenshots, up to 8.
 
-_(Confirm final keyword set — cannot repeat words already in the app name or subtitle)_
-
-**Promotional text (170 chars max — can be updated without a new submission):**
-`Study for your CCNA with structured lessons, spaced repetition, and daily streaks. 37 topics. Fully offline.`
-
-### 4. Screenshots
-
-Required sizes (iOS):
-
-| Device                                    | Screen size | Count required |
-| ----------------------------------------- | ----------- | -------------- |
-| iPhone 6.7" (iPhone 15 Pro Max)           | 1290×2796px | 3–10           |
-| iPhone 6.5" (iPhone 14 Plus / 13 Pro Max) | 1284×2778px | 3–10           |
-| iPad 12.9" (3rd gen or later)             | 2048×2732px | 3–10           |
+| Type            | Size                                                     | Count |
+| --------------- | -------------------------------------------------------- | ----- |
+| Phone           | min 320px / max 3840px shortest side, 16:9 or 9:16 ratio | 2–8   |
+| Feature graphic | 1024×500px                                               | 1     |
 
 **Recommended screenshots (in order):**
 
@@ -101,47 +89,71 @@ Required sizes (iOS):
 2. SectionScreen — lesson path with completed and active nodes
 3. QuizScreen — multiple choice question in progress
 4. QuizScreen — fill-in-the-blank question
-5. ResultScreen — perfect score with confetti
+5. ResultScreen — perfect score
 6. ResultScreen — streak milestone
 
-**Screenshot production note:** The Developer can provide a running build at [localhost:8081](http://localhost:8081) for screen capture, or produce screenshots via the iOS Simulator once a development build is available.
+**Screenshot production:** Developer runs the app on an Android emulator via `npx expo start` or supplies an internal testing build.
 
-### 5. Privacy nutrition labels
+### 4. Content rating
 
-Based on Legal's privacy policy review, the correct labels are:
+Complete the IARC questionnaire in Play Console:
 
-| Category           | Selection                                                                       |
-| ------------------ | ------------------------------------------------------------------------------- |
-| Data Not Collected | ✅ — the app collects no data linked to the user or device                      |
-| Crash Data         | Collected, not linked to user (Sentry — used for app functionality / analytics) |
+- No violence, no adult content, no gambling, no user-generated content
+- No personal data collected from users (Sentry crash data is anonymous)
+- **Expected result:** Everyone (E)
 
-**Instruction:** In App Store Connect → App Privacy, select "Data Not Collected" for all personal data categories. For crash data, select "Crash Data" → "App Functionality" → "Not Linked to You". Confirm final selections against the live privacy policy text once Legal delivers it.
+### 5. Data safety form
 
-### 6. App Review information
+Google Play requires a Data Safety declaration. Based on the privacy policy:
 
-| Field              | Value                                                                                                                                                                                   |
-| ------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Sign-in required   | No                                                                                                                                                                                      |
-| Notes for reviewer | "CCNAQuest is a fully offline study app. No account is needed. On first launch, an onboarding flow introduces the mechanics. All content and progress is stored locally on the device." |
-| Demo account       | N/A                                                                                                                                                                                     |
-| Contact info       | Programme Manager email + phone                                                                                                                                                         |
+| Data type       | Collected? | Shared? | Notes                                |
+| --------------- | ---------- | ------- | ------------------------------------ |
+| Personal info   | No         | —       | No account, no name, no email        |
+| Location        | No         | —       | —                                    |
+| App activity    | No         | —       | Study progress stored locally only   |
+| App info & perf | Yes        | No      | Crash reports via Sentry (anonymous) |
+
+**Instruction:** In Data Safety → declare data is collected only for **App info and performance (Crash logs)**. Mark: collected, not shared, not required for app functionality (optional). All other categories: not collected.
+
+### 6. Release track
+
+Use **Internal testing** track first (up to 100 testers via email, instant publish, no Google review required):
+
+1. Upload the AAB produced by `eas build --platform android --profile production`
+2. Add tester email addresses under Internal testing
+3. When QA sign-off is complete, **Promote to Production**
+
+---
+
+## iOS App Store — v1.1 (after Android launch)
+
+Revisit once Android is live and stable. Additional requirements:
+
+- Apple Developer Program paid tier ($99/yr)
+- iOS-specific screenshots (1290×2796px for iPhone 6.7")
+- App Store Connect record with `com.cawarden.ccnaquest` bundle ID
+- App Store privacy nutrition labels (separate from Google Play data safety)
 
 ---
 
 ## Key Dates
 
-| Milestone                      | Dependency                                           | Target |
-| ------------------------------ | ---------------------------------------------------- | ------ |
-| App record created             | Apple Developer account active + bundle ID confirmed | Day 8  |
-| Listing copy draft for review  | Legal trademark recommendation received              | Day 9  |
-| Screenshots delivered          | iOS Simulator / device build available               | Day 10 |
-| Privacy labels configured      | Live privacy policy URL from Legal                   | Day 10 |
-| App ready for first submission | All of the above + production build                  | Week 3 |
+| Milestone                       | Dependency                                 |
+| ------------------------------- | ------------------------------------------ |
+| Google Play account registered  | $25 payment                                |
+| App record created              | Account active + package name confirmed    |
+| Internal testing build uploaded | EAS production Android build + tester list |
+| Listing copy approved           | Legal trademark recommendation received    |
+| Feature graphic created         | Designer / Developer                       |
+| Screenshots captured            | Android emulator or device build available |
+| Data safety form completed      | Privacy policy finalised                   |
+| Promoted to production          | QA sign-off + SME review ≥80% + all above  |
 
 ---
 
 ## Notes
 
-- Do not submit until the Developer gives a "production build approved" signal — submitting a buggy binary wastes a review slot and restarts the clock
-- App Review currently averages 24–48 hours. Plan for 72 hours as a buffer
-- If Apple queries the "CCNA" trademark during review, Legal's written disclaimer recommendation is your response evidence
+- Do not promote to production until the Developer gives a "QA approved" signal
+- Google Play review for new apps typically takes 1–3 days
+- If Google queries the "CCNA" trademark, Legal's written disclaimer is the response
+- `com.cawarden.ccnaquest` is locked forever once the app is published — it cannot be changed

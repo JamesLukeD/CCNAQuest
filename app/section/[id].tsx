@@ -1,7 +1,7 @@
 import React, { useRef, useEffect, useState } from 'react';
 import {
   ScrollView, View, Text, Pressable, StyleSheet,
-  Animated, Platform, Dimensions, Image, Alert,
+  Animated, Platform, Dimensions, Image, Alert, Modal,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useLocalSearchParams, useRouter } from 'expo-router';
@@ -10,7 +10,7 @@ import { ALL_SECTIONS } from '../../data/sections';
 import { ALL_MODULES } from '../../data/modules';
 import { useStore } from '../../lib/store';
 import { getDueCount, getLessonDueCount, buildReviewLesson } from '../../lib/sm2';
-import { BG, MUTED_HERO, SPACING } from '../../lib/theme';
+import { BG, MUTED, MUTED_HERO, SPACING, SURFACE_1, BORDER } from '../../lib/theme';
 import { BackButton } from '../../components/BackButton';
 import { HeroPill, HeroProgressBar } from '../../components/HeroPill';
 
@@ -87,9 +87,9 @@ function TrailDots({ from, to, color, lit }: {
           position: 'absolute',
           left: d.x - 5, top: d.y - 5,
           width: 10, height: 10, borderRadius: 5,
-          backgroundColor: lit ? color + '99' : '#1e3040',
+          backgroundColor: lit ? color + '99' : color + '26',
           borderWidth: 2,
-          borderColor: lit ? color + 'cc' : '#253545',
+          borderColor: lit ? color + 'cc' : color + '40',
         }} />
       ))}
     </>
@@ -140,7 +140,7 @@ function PathNode({ lesson, idx, isDone, isUnlocked, isCurrent, due, color, x, y
         </Text>
       </Pressable>
       <View style={styles.nodeLabel}>
-        {due > 0 && !isDone && (
+        {due > 0 && !isDone && isUnlocked && (
           <View style={styles.dueBadge}>
             <Text style={styles.dueBadgeText}>🔁 {due}</Text>
           </View>
@@ -188,6 +188,7 @@ export default function SectionScreen() {
   const hearts           = useStore((s) => s.hearts);
   const setPendingReview = useStore((s) => s.setPendingReview);
   const [lockedToast, setLockedToast] = useState(false);
+  const [selectedLesson, setSelectedLesson] = useState<{ idx: number; lesson: any } | null>(null);
 
   const frogBob = useRef(new Animated.Value(0)).current;
   useLoop(frogBob, 0, -10, 1400);
@@ -278,15 +279,19 @@ export default function SectionScreen() {
       {/* Path canvas */}
       <View style={[styles.pathCanvas, { height: canvasH, width: PATH_W }]}>
         {/* Frog mascot beside active node */}
-        {doneLessons < sec.lessons.length && (() => {
-          const pos = nodePos(doneLessons);
+        {(() => {
+          const allDone = doneLessons >= sec.lessons.length;
+          const nodeIdx = allDone ? sec.lessons.length - 1 : doneLessons;
+          const pos = nodePos(nodeIdx);
           const onRight = pos.x <= PATH_W / 2;
           const frogLeft = onRight
             ? pos.x + NODE_SIZE / 2 + 10
             : pos.x - NODE_SIZE / 2 - FROG_SIZE - 10;
           return (
             <Animated.Image
-              source={require('../../assets/animations/frog/thinking.png')}
+              source={allDone
+                ? require('../../assets/animations/frog/celebrate.png')
+                : require('../../assets/animations/frog/thinking.png')}
               style={{
                 position: 'absolute',
                 width: FROG_SIZE, height: FROG_SIZE,
@@ -327,18 +332,7 @@ export default function SectionScreen() {
               isDone={isDone} isUnlocked={isUnlocked} isCurrent={isCurrent}
               due={due} color={color} x={x} y={y}
               calloutLabel={isCurrent ? (doneLessons === 0 ? '▶  CONNECT' : '▶  CONTINUE') : undefined}
-              onPress={() => {
-                // B3: Gate lesson entry when hearts are spent.
-                if (hearts === 0) {
-                  Alert.alert(
-                    'Hearts Spent',
-                    'Your hearts are spent. Rest and return tomorrow, apprentice.',
-                    [{ text: 'OK' }],
-                  );
-                  return;
-                }
-                router.push(`/quiz/${id}:${lesson.id}`);
-              }}
+              onPress={() => setSelectedLesson({ idx: i, lesson })}
               onLockedPress={showLockedToast}
             />
           );
@@ -365,6 +359,38 @@ export default function SectionScreen() {
         })()}
       </View>
     </ScrollView>
+
+    {/* Lesson start popup */}
+    {selectedLesson && (
+      <Modal transparent animationType="fade" visible onRequestClose={() => setSelectedLesson(null)}>
+        <Pressable style={styles.lessonPopupOverlay} onPress={() => setSelectedLesson(null)}>
+          <Pressable style={[styles.lessonPopupCard, { borderColor: color + '99' }]} onPress={() => {}}>
+            <Text style={styles.lessonPopupNum}>LESSON {selectedLesson.idx + 1}</Text>
+            <Text style={styles.lessonPopupTitle}>{selectedLesson.lesson.title}</Text>
+            <Pressable
+              style={[styles.lessonPopupBtn, { backgroundColor: color }]}
+              onPress={() => {
+                const lesson = selectedLesson.lesson;
+                setSelectedLesson(null);
+                if (hearts === 0) {
+                  Alert.alert(
+                    'Hearts Spent',
+                    'Your hearts are spent. Rest and return tomorrow, apprentice.',
+                    [{ text: 'OK' }],
+                  );
+                  return;
+                }
+                router.push(`/quiz/${id}:${lesson.id}`);
+              }}
+            >
+              <Text style={styles.lessonPopupBtnText}>
+                {!!completed[`${id}:${selectedLesson.lesson.id}`]?.done ? 'Practice  ↺' : 'Start  +10 XP  →'}
+              </Text>
+            </Pressable>
+          </Pressable>
+        </Pressable>
+      </Modal>
+    )}
 
     {/* Locked node feedback toast (P8) */}
     {lockedToast && (
@@ -426,4 +452,57 @@ const styles = StyleSheet.create({
     borderRadius: 10, paddingHorizontal: 7, paddingVertical: 3, marginBottom: 5,
   },
   dueBadgeText: { fontSize: 10, color: '#ff9600', fontWeight: '800' },
+
+  // Lesson start popup
+  lessonPopupOverlay: {
+    flex: 1,
+    backgroundColor: '#00000088',
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 32,
+  },
+  lessonPopupCard: {
+    backgroundColor: SURFACE_1,
+    borderRadius: 20,
+    borderWidth: 2,
+    paddingHorizontal: 24,
+    paddingTop: 28,
+    paddingBottom: 24,
+    width: '100%',
+    maxWidth: 340,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 12 },
+    shadowOpacity: 0.6,
+    shadowRadius: 20,
+    elevation: 20,
+  },
+  lessonPopupNum: {
+    fontSize: 11,
+    fontWeight: '800',
+    letterSpacing: 2,
+    color: MUTED,
+    textTransform: 'uppercase',
+    marginBottom: 8,
+  },
+  lessonPopupTitle: {
+    fontSize: 20,
+    fontWeight: '900',
+    color: '#ffffff',
+    textAlign: 'center',
+    marginBottom: 24,
+    lineHeight: 28,
+  },
+  lessonPopupBtn: {
+    width: '100%',
+    borderRadius: 14,
+    paddingVertical: 16,
+    alignItems: 'center',
+  },
+  lessonPopupBtnText: {
+    fontSize: 16,
+    fontWeight: '900',
+    color: '#ffffff',
+    letterSpacing: 0.5,
+  },
 });

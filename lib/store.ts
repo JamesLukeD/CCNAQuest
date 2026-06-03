@@ -4,9 +4,10 @@ import * as Sentry from '@sentry/react-native';
 import type { AppState, SM2Card } from './types';
 import { updateCard as sm2UpdateCard } from './sm2';
 
-const STORAGE_KEY   = 'ccna_quest_v3'; // key unchanged — migration is handled in-value
-const SCHEMA_VERSION = 5;              // bump this whenever AppState shape changes
+const STORAGE_KEY    = 'ccna_quest_v3'; // key unchanged — migration is handled in-value
+const SCHEMA_VERSION = 6;               // bump this whenever AppState shape changes
 const MAX_HEARTS = 5;
+const HEART_REFILL_MS = 30 * 60 * 1000; // 1 heart every 30 minutes
 
 const DEFAULT_STATE: AppState = {
   xp: 0,
@@ -20,6 +21,7 @@ const DEFAULT_STATE: AppState = {
   onboardingComplete: false,
   streakBroken: false,
   lastStreakMilestoneCelebrated: 0,
+  nextHeartAt: null,
 };
 
 interface Store extends AppState {
@@ -29,6 +31,7 @@ interface Store extends AppState {
   updateSM2: (key: string, quality: 1 | 3 | 4) => void;
   resetHearts: () => void;
   loseHeart: () => void;
+  checkHeartRefill: () => void;
   addXP: (amount: number) => void;
   setPendingReview: (lesson: AppState['pendingReview']) => void;
   completeOnboarding: () => void;
@@ -46,11 +49,15 @@ export const useStore = create<Store>((set, get) => ({
       const base = raw ? migrate(JSON.parse(raw) as Record<string, any>) : {};
       const today = new Date().toDateString();
       const yesterday = new Date(Date.now() - 86_400_000).toDateString();
-      const loaded = { ...DEFAULT_STATE, ...base };
+      let loaded = { ...DEFAULT_STATE, ...base };
 
-      // B1: Auto-refill hearts when a new day has started.
+      // B1: Restore any hearts that have accumulated since last session.
+      loaded = applyHeartRefill(loaded);
+
+      // Safety net: new day always tops up to full.
       if (loaded.lastPlayed !== today) {
         loaded.hearts = MAX_HEARTS;
+        loaded.nextHeartAt = null;
       }
 
       // B4: Detect broken streak on open.
@@ -73,6 +80,7 @@ export const useStore = create<Store>((set, get) => ({
   completeLesson: (lessonId, perfect, wrongCount) => {
     const state = get();
     const completed = { ...state.completed };
+    const isFirstTime = !completed[lessonId];
     if (!completed[lessonId]) {
       completed[lessonId] = { done: true, perfect };
     } else if (perfect) {
@@ -89,7 +97,9 @@ export const useStore = create<Store>((set, get) => ({
       streakIncremented = true;
     }
 
-    const xpEarned = wrongCount === 0 ? 20 : Math.max(5, 10 - wrongCount * 2);
+    const xpEarned = isFirstTime
+      ? (wrongCount === 0 ? 20 : Math.max(5, 10 - wrongCount * 2))
+      : 0;
     const xp = state.xp + xpEarned;
     set({ completed, streak, lastPlayed, xp });
     _persist(get());
@@ -105,14 +115,27 @@ export const useStore = create<Store>((set, get) => ({
 
   resetHearts: () => {
     // B2: Refill to MAX_HEARTS, not a hardcoded 3.
-    set({ hearts: MAX_HEARTS });
+    set({ hearts: MAX_HEARTS, nextHeartAt: null });
     _persist(get());
   },
 
   loseHeart: () => {
-    const hearts = Math.max(0, get().hearts - 1);
-    set({ hearts });
+    const state = get();
+    const hearts = Math.max(0, state.hearts - 1);
+    // Start the refill timer on first loss (don't reset it if already ticking).
+    const nextHeartAt = hearts < MAX_HEARTS && state.nextHeartAt === null
+      ? Date.now() + HEART_REFILL_MS
+      : state.nextHeartAt;
+    set({ hearts, nextHeartAt });
     _persist(get());
+  },
+
+  checkHeartRefill: () => {
+    const updated = applyHeartRefill(get());
+    if (updated.hearts !== get().hearts || updated.nextHeartAt !== get().nextHeartAt) {
+      set({ hearts: updated.hearts, nextHeartAt: updated.nextHeartAt });
+      _persist(get());
+    }
   },
 
   addXP: (amount) => {
@@ -154,12 +177,25 @@ export const useStore = create<Store>((set, get) => ({
   },
 }));
 
+// ── Heart refill helper ────────────────────────────────────────
+// Calculates how many 30-min periods have elapsed and adds that many hearts.
+function applyHeartRefill<T extends { hearts: number; nextHeartAt: number | null }>(state: T): T {
+  let { hearts, nextHeartAt } = state;
+  if (nextHeartAt === null || hearts >= MAX_HEARTS) return state;
+  const now = Date.now();
+  while (nextHeartAt !== null && now >= nextHeartAt && hearts < MAX_HEARTS) {
+    hearts += 1;
+    nextHeartAt = hearts < MAX_HEARTS ? nextHeartAt + HEART_REFILL_MS : null;
+  }
+  return { ...state, hearts, nextHeartAt };
+}
+
 function _persist(state: AppState) {
-  const { xp, streak, hearts, lastPlayed, completed, sm2, onboardingComplete, lastStreakMilestoneCelebrated } = state;
+  const { xp, streak, hearts, lastPlayed, completed, sm2, onboardingComplete, lastStreakMilestoneCelebrated, nextHeartAt } = state;
   // pendingReview, hasLoaded, streakBroken are intentionally excluded — ephemeral.
   AsyncStorage.setItem(
     STORAGE_KEY,
-    JSON.stringify({ _v: SCHEMA_VERSION, xp, streak, hearts, lastPlayed, completed, sm2, onboardingComplete, lastStreakMilestoneCelebrated }),
+    JSON.stringify({ _v: SCHEMA_VERSION, xp, streak, hearts, lastPlayed, completed, sm2, onboardingComplete, lastStreakMilestoneCelebrated, nextHeartAt }),
   ).catch((err: unknown) => {
     Sentry.captureException(err, { tags: { source: '_persist' } });
     console.error('[_persist] AsyncStorage write failed:', err);
@@ -186,6 +222,11 @@ function migrate(raw: Record<string, any>): AppState {
     // Existing users have already seen the app — skip onboarding.
     state.onboardingComplete = state.onboardingComplete ?? true;
     state.lastStreakMilestoneCelebrated = state.lastStreakMilestoneCelebrated ?? 0;
+  }
+
+  // v5 → v6: Add nextHeartAt for incremental 30-min heart refill.
+  if (version < 6) {
+    state.nextHeartAt = null;
   }
 
   // Strip the internal version key before spreading into AppState.

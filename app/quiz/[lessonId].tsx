@@ -118,6 +118,7 @@ export default function QuizScreen() {
   }
 
   function advance() {
+    if (!lesson) return;
     if (qIndex + 1 >= questions.length) {
       // Lesson complete
       const [sectionId] = (lessonId ?? '').split(':');
@@ -141,6 +142,7 @@ export default function QuizScreen() {
           streakUp: streakUp ? '1' : '0',
           isReview: lesson?.isReview ? '1' : '0',
           xpEarned: String(xpEarned),
+          lessonId: lessonId ?? '',
         },
       });
       return;
@@ -156,7 +158,7 @@ export default function QuizScreen() {
       const [sectionId, lId] = (lessonId ?? '').split(':');
       updateSM2(`${lId}:${q._origIdx}`, quality);
     }
-    setCorrectCount((c) => c + 1);
+    if (firstAttemptRef.current) setCorrectCount((c) => c + 1);
     setAnswerState('correct');
   }
 
@@ -179,7 +181,7 @@ export default function QuizScreen() {
     const tq = q as TeachQuestion;
     return (
       <View style={[styles.root, { paddingTop: insets.top, paddingBottom: insets.bottom }]}>
-        <ProgressBar progress={progress} />
+        <QuizHeader progress={progress} onClose={() => router.back()} />
         <ScrollView contentContainerStyle={styles.questionContent}>
           <Text style={styles.teachLabel}>📖 LEARN</Text>
           <Text style={styles.teachTitle}>{tq.title}</Text>
@@ -200,6 +202,7 @@ export default function QuizScreen() {
       <QuestionShell
         progress={progress}
         question={mq.question}
+        questionType="🧪 PRACTICE"
         insets={insets}
         answerState={answerState}
         explanation={mq.explanation}
@@ -207,7 +210,9 @@ export default function QuizScreen() {
       >
         {shuffled.map((choice) => {
           const isSelected = selectedChoice === choice;
-          const color = !isSelected ? '#2a3a4a'
+          const isCorrectAnswer = answerState === 'wrong' && choice === mq.answer;
+          const color = isCorrectAnswer ? '#58cc02'
+            : !isSelected ? '#2a3a4a'
             : answerState === 'correct' ? '#58cc02'
             : answerState === 'wrong' ? '#ff4b4b'
             : '#1cb0f6';
@@ -222,7 +227,7 @@ export default function QuizScreen() {
                 else handleWrong();
               }}
             >
-              <Text style={[styles.choiceText, isSelected && { color: '#ffffff' }]}>{choice}</Text>
+              <Text style={[styles.choiceText, (isSelected || isCorrectAnswer) && { color: '#ffffff' }]}>{choice}</Text>
             </Pressable>
           );
         })}
@@ -237,6 +242,7 @@ export default function QuizScreen() {
       <QuestionShell
         progress={progress}
         question={tq.question}
+        questionType="⚖️ TRUE OR FALSE"
         insets={insets}
         answerState={answerState}
         explanation={tq.explanation}
@@ -245,7 +251,9 @@ export default function QuizScreen() {
         {(['True', 'False'] as const).map((opt) => {
           const val = opt === 'True';
           const isSelected = selectedChoice === opt;
-          const color = !isSelected ? '#2a3a4a'
+          const isCorrectAnswer = answerState === 'wrong' && val === tq.answer;
+          const color = isCorrectAnswer ? '#58cc02'
+            : !isSelected ? '#2a3a4a'
             : answerState === 'correct' ? '#58cc02'
             : answerState === 'wrong' ? '#ff4b4b'
             : '#1cb0f6';
@@ -260,7 +268,7 @@ export default function QuizScreen() {
                 else handleWrong();
               }}
             >
-              <Text style={[styles.choiceText, isSelected && { color: '#ffffff' }]}>
+              <Text style={[styles.choiceText, (isSelected || isCorrectAnswer) && { color: '#ffffff' }]}>
                 {opt === 'True' ? '✅ True' : '❌ False'}
               </Text>
             </Pressable>
@@ -277,6 +285,7 @@ export default function QuizScreen() {
       <QuestionShell
         progress={progress}
         question={fq.question}
+        questionType="✏️ FILL IN"
         insets={insets}
         answerState={answerState}
         explanation={fq.explanation}
@@ -305,6 +314,9 @@ export default function QuizScreen() {
             }}
           />
         </Animated.View>
+        {answerState === 'wrong' && (
+          <Text style={styles.correctAnswerHint}>Correct: {fq.answer}</Text>
+        )}
         {answerState === 'idle' && (
           <PrimaryButton
             label="Check"
@@ -328,6 +340,7 @@ export default function QuizScreen() {
       <QuestionShell
         progress={progress}
         question={wq.question}
+        questionType="📚 ARRANGE"
         insets={insets}
         answerState={answerState}
         explanation={wq.explanation}
@@ -402,22 +415,31 @@ export default function QuizScreen() {
 }
 
 // ── Sub-components ─────────────────────────────────────────────
-function ProgressBar({ progress }: { progress: number }) {
+function QuizHeader({ progress, onClose }: { progress: number; onClose: () => void }) {
   return (
-    <View style={pbStyles.track}>
-      <View style={[pbStyles.fill, { width: `${progress * 100}%` as any }]} />
+    <View style={qhStyles.row}>
+      <Pressable onPress={onClose} hitSlop={14} style={qhStyles.closeBtn}>
+        <Text style={qhStyles.closeText}>✕</Text>
+      </Pressable>
+      <View style={qhStyles.barWrap}>
+        <View style={[qhStyles.barFill, { width: `${progress * 100}%` as any }]} />
+      </View>
     </View>
   );
 }
 
-const pbStyles = StyleSheet.create({
-  track: { height: 8, backgroundColor: BORDER, marginHorizontal: 20, marginTop: 12, marginBottom: 8, borderRadius: 4, overflow: 'hidden' },
-  fill: { height: '100%', backgroundColor: '#58cc02', borderRadius: 4 },
+const qhStyles = StyleSheet.create({
+  row: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, paddingTop: 12, paddingBottom: 8, gap: 10 },
+  closeBtn: { padding: 4 },
+  closeText: { color: MUTED, fontSize: 20, lineHeight: 22 },
+  barWrap: { flex: 1, height: 8, backgroundColor: BORDER, borderRadius: 4, overflow: 'hidden' },
+  barFill: { height: '100%', backgroundColor: '#1cb0f6', borderRadius: 4 },
 });
 
 interface ShellProps {
   progress: number;
   question: string;
+  questionType?: string;
   insets: { top: number; bottom: number };
   answerState: AnswerState;
   explanation?: string;
@@ -425,9 +447,10 @@ interface ShellProps {
   children: React.ReactNode;
 }
 
-function QuestionShell({ progress, question, insets, answerState, explanation, onContinue, children }: ShellProps) {
+function QuestionShell({ progress, question, questionType, insets, answerState, explanation, onContinue, children }: ShellProps) {
+  const router = useRouter();
   const feedbackColor = answerState === 'correct' ? '#58cc02' : '#ff4b4b';
-  const feedbackLabel = answerState === 'correct' ? '✓ Correct!' : '✗ Incorrect';
+  const feedbackLabel = answerState === 'correct' ? '✨ Well cast!' : '💀 The spell fizzled.';
 
   const flashAnim = useRef(new Animated.Value(0)).current;
   const frogScale = useRef(new Animated.Value(0)).current;
@@ -491,8 +514,9 @@ function QuestionShell({ progress, question, insets, answerState, explanation, o
         style={[StyleSheet.absoluteFill, { backgroundColor: feedbackColor, opacity: flashOpacity }]}
         pointerEvents="none"
       />
-      <ProgressBar progress={progress} />
+      <QuizHeader progress={progress} onClose={() => router.back()} />
       <ScrollView contentContainerStyle={styles.questionContent} keyboardShouldPersistTaps="handled">
+        {questionType && <Text style={styles.questionTypeLabel}>{questionType}</Text>}
         <Text style={styles.questionText}>{question}</Text>
         <View style={styles.choicesContainer}>{children}</View>
       </ScrollView>
@@ -544,10 +568,12 @@ const styles = StyleSheet.create({
 
   // Shell
   questionContent: { padding: 20, paddingBottom: 8 },
+  questionTypeLabel: { fontSize: 11, fontWeight: '800', color: '#1cb0f6', letterSpacing: 1.4, marginBottom: 8 },
   questionText: { fontSize: 20, fontWeight: '700', color: '#ffffff', lineHeight: 28, marginBottom: 20 },
   choicesContainer: { gap: 10 },
   feedbackBar: {
     padding: 20, borderTopWidth: 2, backgroundColor: SURFACE_1,
+    borderTopLeftRadius: RADIUS.md, borderTopRightRadius: RADIUS.md,
   },
   feedbackLabel: { fontSize: 18, fontWeight: '800', marginBottom: 6 },
   feedbackExplanation: { fontSize: 14, color: '#c8d8e8', marginBottom: 14, lineHeight: 22 },
@@ -579,6 +605,7 @@ const styles = StyleSheet.create({
   },
   fillCorrect: { borderColor: '#58cc02' },
   fillWrong: { borderColor: '#ff4b4b' },
+  correctAnswerHint: { color: '#58cc02', fontSize: 14, fontWeight: '700', marginBottom: 12 },
 
   // WordBank
   wbAnswerArea: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginBottom: 20 },
@@ -593,7 +620,11 @@ const styles = StyleSheet.create({
     borderRadius: RADIUS.lg, paddingHorizontal: 14, paddingVertical: 8,
   },
   wbChipText: { color: '#c8d8e8', fontSize: 14, fontWeight: '600' },
-  retryBtn: { marginTop: 8, alignSelf: 'flex-start' },
+  retryBtn: {
+    marginTop: 8, alignSelf: 'flex-start',
+    borderWidth: 2, borderColor: '#ff9600',
+    borderRadius: RADIUS.sm, paddingHorizontal: 16, paddingVertical: 8,
+  },
   retryText: { color: '#ff9600', fontSize: 15, fontWeight: '700' },
 
   // Footer

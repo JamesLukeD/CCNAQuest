@@ -84,7 +84,7 @@ export const SECTION_HOST_TO_HOST: Section = {
           type: 'tf',
           question: 'The TCP/IP Application layer covers OSI layers 5, 6 and 7.',
           answer: true,
-          explanation: 'Correct! The TCP/IP Application layer combines the Session, Presentation, and Application layers of the OSI model.',
+          explanation: 'The TCP/IP Application layer combines the Session, Presentation, and Application layers of the OSI model.',
         },
         {
           type: 'fill',
@@ -271,7 +271,7 @@ export const SECTION_HOST_TO_HOST: Section = {
           type: 'tf',
           question: 'Encapsulation adds headers as data travels DOWN the OSI model layers.',
           answer: true,
-          explanation: 'Correct! On the sending side, each layer adds its own header as data moves from Layer 7 down to Layer 1.',
+          explanation: 'On the sending side, each layer adds its own header as data moves from Layer 7 down to Layer 1.',
         },
         {
           type: 'mcq',

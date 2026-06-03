@@ -125,7 +125,7 @@ export const SECTION_CISCO_IOS: Section = {
           type: 'tf',
           question: 'In IOS, you can abbreviate commands as long as the abbreviation is unique.',
           answer: true,
-          explanation: 'Correct! IOS accepts abbreviated commands as long as they are unambiguous. For example, "en" works for "enable" and "conf t" for "configure terminal".',
+          explanation: 'IOS accepts abbreviated commands as long as they are unambiguous. For example, "en" works for "enable" and "conf t" for "configure terminal".',
         },
         {
           type: 'mcq',
@@ -218,7 +218,7 @@ export const SECTION_CISCO_IOS: Section = {
           type: 'tf',
           question: 'Router interfaces are administratively shutdown by default.',
           answer: true,
-          explanation: 'Correct! On Cisco routers, all interfaces default to "administratively down". You must use "no shutdown" to bring them up. Switches are the opposite — ports are up by default.',
+          explanation: 'On Cisco routers, all interfaces default to "administratively down". You must use "no shutdown" to bring them up. Switches are the opposite — ports are up by default.',
         },
         {
           type: 'mcq',
@@ -270,7 +270,7 @@ export const SECTION_CISCO_IOS: Section = {
           type: 'tf',
           question: '"enable secret" stores the password in MD5 hash format.',
           answer: true,
-          explanation: 'Correct! "enable secret" stores the password as an MD5 (Type 5) hash, making it much harder to reverse than the plain-text "enable password".',
+          explanation: '"enable secret" stores the password as an MD5 (Type 5) hash, making it much harder to reverse than the plain-text "enable password".',
         },
         {
           type: 'mcq',
@@ -282,7 +282,7 @@ export const SECTION_CISCO_IOS: Section = {
           type: 'tf',
           question: 'The "login" command under a line is required for the password to be enforced.',
           answer: true,
-          explanation: 'Correct! Setting a password alone is not enough — you must also type "login" to tell IOS to prompt for that password when someone connects.',
+          explanation: 'Setting a password alone is not enough — you must also type "login" to tell IOS to prompt for that password when someone connects.',
         },
         {
           type: 'mcq',
@@ -346,7 +346,7 @@ export const SECTION_CISCO_IOS: Section = {
           type: 'tf',
           question: '"write memory" and "copy running-config startup-config" achieve the same result.',
           answer: true,
-          explanation: 'Correct! Both commands save the running-config to NVRAM as the startup-config. "write memory" is the older syntax; "copy run start" is the modern IOS way.',
+          explanation: 'Both commands save the running-config to NVRAM as the startup-config. "write memory" is the older syntax; "copy run start" is the modern IOS way.',
         },
       ],
     },
@@ -401,7 +401,7 @@ export const SECTION_CISCO_IOS: Section = {
           type: 'tf',
           question: '"enable secret" is always stored encrypted, regardless of "service password-encryption".',
           answer: true,
-          explanation: 'Correct! "enable secret" is always stored as an MD5 hash. "service password-encryption" only affects "enable password" and line passwords, applying weaker Type 7 encryption.',
+          explanation: '"enable secret" is always stored as an MD5 hash. "service password-encryption" only affects "enable password" and line passwords, applying weaker Type 7 encryption.',
         },
         {
           type: 'mcq',

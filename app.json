@@ -12,15 +12,13 @@
       "image": "./assets/splash-icon.png",
       "resizeMode": "contain",
       "backgroundColor": "#0e1a20"
-    },
-    "ios": {
+    },    "privacyPolicyUrl": "https://jamesluked.github.io/CCNAQuest/privacy.html",    "ios": {
       "supportsTablet": false,
       "bundleIdentifier": "com.cawarden.ccnaquest",
       "buildNumber": "1"
     },
     "android": {
       "package": "com.cawarden.ccnaquest",
-      "versionCode": 1,
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#0e1a20"

@@ -1,8 +1,8 @@
 # CCNAQuest — QA Engineer Brief
 
-**Date:** 19 May 2026
+**Last updated:** 2 June 2026
 **Role:** QA Engineer
-**Status:** Not yet needed — engage when production build is stable and SME review ≥80% complete
+**Status:** Not yet started — engage when production build is available AND SME review ≥80% complete
 
 ---
 

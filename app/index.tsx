@@ -12,8 +12,8 @@ import { useStore } from '../lib/store';
 import { BG, SURFACE_1, SURFACE_2, BORDER, MUTED, RADIUS, SPACING } from '../lib/theme';
 import { SectionDivider } from '../components/SectionDivider';
 
-const MAX_HEARTS = 5;
-const MAX_XP     = 500;
+const MAX_HEARTS = 5;   // must match store.ts MAX_HEARTS
+const MAX_XP     = 500; // must match store.ts XP per level
 const ND = Platform.OS !== 'web';
 
 function ModuleCard({

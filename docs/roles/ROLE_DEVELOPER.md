@@ -1,152 +1,147 @@
 # CCNAQuest — Developer Brief
 
-**Date:** 19 May 2026
-**Role:** Developer
-**Status:** Active — primary contributor
+**Last updated:** 2 June 2026 — verified from codebase
+**Status:** 99% complete — remaining tasks are infrastructure, hosting, and SME integration
 
 ---
 
-## Where Things Stand
+## What Is Done (verified in code)
 
-The codebase is in a solid state. All 11 bugs from the QA audit are closed, all UX edge states are implemented, Sentry is wired, and the project compiles clean with no TypeScript errors.
-
-**70% launch-ready.** The remaining 30% is almost entirely outside the codebase — assets, legal, and the App Store setup. Your job now shifts from building to integrating as other workstreams deliver.
-
----
-
-## What You Have Done
-
-| Area                                                       | Status                                |
-| ---------------------------------------------------------- | ------------------------------------- |
-| All 11 QA bugs (BUG-001–011)                               | ✅ Closed                             |
-| All UX edge states (H5, M3, Q1, R5 + all P1–P3)            | ✅ Implemented                        |
-| `_persist()` error handling (Sentry + console.error)       | ✅ Done                               |
-| `@sentry/react-native` installed + wired                   | ✅ Done (DSN placeholder — see below) |
-| `eas.json` created, EAS CLI 18.13.1 installed              | ✅ Done                               |
-| `app.json` build-ready (bundleId, scheme, version, colors) | ✅ Done                               |
-| 17 SVG icons in `assets/icons/`                            | ✅ Done                               |
-| SM-2 spaced repetition functional                          | ✅ Done                               |
-| Schema v5 + migration                                      | ✅ Done                               |
+| Area | Status |
+|---|---|
+| All 11 QA bugs (BUG-001–011) | ✅ Closed |
+| All UX edge states | ✅ Implemented |
+| Schema v6 + migration | ✅ Done |
+| Incremental heart refill (30 min, `nextHeartAt`) | ✅ Done |
+| SM-2 spaced repetition (`_origIdx` stamping) | ✅ Done |
+| Quiz escape button (× via `QuizHeader`) | ✅ Done |
+| Correct answer reveal on wrong MCQ/TF | ✅ Done |
+| XP bar redesign (16 px, full-width, pulse) | ✅ Done |
+| Sentry real DSN in `_layout.tsx` | ✅ Done — do not overwrite |
+| `app.json` fully configured (bundleId, scheme, icon, splash, EAS projectId) | ✅ Done |
+| `eas.json` with dev/preview/production profiles | ✅ Done |
+| All 37 sections written (~1,400 questions, all 4 modules) | ✅ Done |
+| All assets: icon, adaptive-icon, splash-icon, 7 frog PNGs, 17 SVG icons | ✅ Done |
+| `privacy.html` written (GDPR-compliant, 212 lines) | ✅ Done — needs hosting |
 
 ---
 
-## Immediate Next Actions
+## Immediate Tasks (in priority order)
 
-### 1. Sentry DSN — replace placeholder
+### 1. Fix 2 TypeScript errors
 
-`_layout.tsx` has `dsn: 'REPLACE_WITH_YOUR_SENTRY_DSN'`. Create a project at [sentry.io](https://sentry.io), copy the DSN, and replace it. Do this before any TestFlight build — without it, production crashes are invisible.
-
-```typescript
-// app/_layout.tsx
-Sentry.init({
-  dsn: "https://YOUR_REAL_KEY@YOUR_ORG.ingest.sentry.io/YOUR_PROJECT_ID",
-  debug: __DEV__,
-  enabled: !__DEV__,
-  tracesSampleRate: 0.2,
-});
+```
+app/quiz/[lessonId].tsx(128,55): error TS18047: 'lesson' is possibly 'null'
+app/quiz/[lessonId].tsx(137,24): error TS18047: 'lesson' is possibly 'null'
 ```
 
-### 2. Apple Developer Program — enrol
+Both are inside the `advance()` function. `lesson` is `Lesson | null` and TypeScript doesn't narrow it through the early-return guard into the closure. Add a guard at the top of `advance()`:
 
-- URL: [developer.apple.com/programs/enroll/](https://developer.apple.com/programs/enroll/)
-- Cost: $99/yr
-- Unblocks: Every iOS build, TestFlight, and App Store submission
+```typescript
+function advance() {
+  if (!lesson) return;   // ← add this line
+  if (qIndex + 1 >= questions.length) {
+    ...
+```
 
-### 3. First EAS build (after Apple account is active)
+Verify: `npx tsc --noEmit` → 0 errors.
+
+---
+
+### 2. Host `privacy.html` and wire it into `app.json`
+
+The privacy policy HTML is complete at `privacy.html` in the project root. It needs to be at a live, stable URL before App Store submission.
+
+**Fastest option — GitHub Pages:**
+1. Push `privacy.html` to a public GitHub repo (or the existing project repo) in a `docs/` folder or `gh-pages` branch
+2. Enable GitHub Pages in Settings → Pages
+3. URL format: `https://USERNAME.github.io/REPO/privacy.html`
+
+**Once the URL is live, add to `app.json`:**
+```json
+"privacyPolicyUrl": "https://your-url/privacy.html"
+```
+Add this inside the `"expo"` object.
+
+---
+
+### 3. Fix Sentry source map upload in production
+
+`eas.json` has `SENTRY_DISABLE_AUTO_UPLOAD: "true"` in both `preview` and `production` profiles. This means production crashes will show obfuscated stack traces.
+
+Remove the flag from the `production` profile (keeping it in `preview` is acceptable):
+
+```json
+"production": {
+  "autoIncrement": true
+}
+```
+
+---
+
+### 4. Apple Developer paid tier ($99/yr)
+
+If not yet enrolled: [developer.apple.com/programs/enroll](https://developer.apple.com/programs/enroll/)
+- Enrol as Individual (faster — no D-U-N-S number)
+- This gates all iOS builds, TestFlight, and App Store Connect
+
+---
+
+### 5. First EAS build
+
+Once Apple Developer account is active:
 
 ```bash
-# From project root
-eas login                          # expo.dev account
-eas build:configure                # links project, writes projectId to app.json
+eas login                           # expo.dev account
+eas build:configure                 # writes projectId to app.json if not set (already set)
 eas build --platform ios --profile preview
 ```
 
-The `.ipa` from the preview build goes straight to TestFlight. Watch the build log for `lottie-react-native` native dependency issues — it's the most likely failure point.
+Watch the build log for `lottie-react-native` native dependency failures — most likely single failure point.
 
-### 4. Asset integration (as Illustrator delivers)
-
-When the illustrator delivers files, place them in `assets/animations/frog/` and update these files:
-
-| Asset                  | File to update                                            | Change                                                 |
-| ---------------------- | --------------------------------------------------------- | ------------------------------------------------------ |
-| `perfect.png`          | `app/result.tsx`                                          | Replace `celebrate.png` fallback on R1 (perfect score) |
-| `pointing.png`         | `app/onboarding/mechanics.tsx`, `app/onboarding/path.tsx` | Replace placeholder frog on screens 2 and 3            |
-| `streak.png`           | `app/index.tsx`                                           | Replace frog in H4 milestone modal                     |
-| `icon.png` (1024×1024) | `app.json` → `"icon"` field                               | Remove placeholder, point to real asset                |
-| `adaptive-icon.png`    | `app.json` → `android.adaptiveIcon.foregroundImage`       | Android home screen icon                               |
-
-### 5. Privacy policy hosting (coordinate with Legal)
-
-Once Legal delivers the privacy policy document, host it at a live URL. Options:
-
-- **GitHub Pages** (zero cost, works immediately — create a `gh-pages` branch or a `/docs` folder in a public repo)
-- **Netlify / Vercel** (one-click deploy of a static HTML file)
-- **Notion** (public page — acceptable but not ideal as it can go behind a login)
-
-The URL gets added to two places:
-
-1. `app.json` → `"privacyPolicyUrl"` field (for Expo)
-2. App Store Connect → App Privacy section
-
-### 6. SME content corrections (ongoing)
-
-When the CCNA SME flags corrections, you'll receive them as a review spreadsheet (section ID, field, current value, corrected value). Apply changes to the corresponding files in `data/1.fundamentals/`, `data/2.routing-switching/`, `data/3.security-services/`, `data/4.modern-networking/`. No build steps required — content is static TypeScript.
+The preview `.ipa` goes directly to TestFlight for internal testing.
 
 ---
 
-## Key Technical Notes
+### 6. Accessibility minimum pass
 
-### npm install flag
+Zero accessibility props exist anywhere in the app. Apple checks VoiceOver during review. Minimum required before submission:
 
-Due to `lottie-react-native@7.3.8` / `@lottiefiles/dotlottie-react@0.19.2` peerOptional conflict, always use `--legacy-peer-deps` when installing new packages:
+- Add `accessibilityLabel` to all interactive `Pressable` elements
+- Add `accessibilityRole="button"` to pressable elements
+- Replace hardcoded `fontSize` values in `StyleSheet` with values from `lib/theme.ts` `FONT` tokens so Dynamic Type is respected
+- Check touch targets are ≥ 44×44 pt on small screens (iPhone SE)
 
+---
+
+### 7. Implement SME content corrections (ongoing)
+
+When the CCNA SME delivers a corrections spreadsheet, apply changes to the relevant files in:
+- `data/sections/1.fundamentals/`
+- `data/sections/2.routing-switching/`
+- `data/sections/3.security-services/`
+- `data/sections/4.modern-networking/`
+
+No build steps required — content is static TypeScript. Run `npx tsc --noEmit` after any data file edits to catch type errors.
+
+---
+
+## Technical Notes
+
+### Install flag
+Always use `--legacy-peer-deps` due to `lottie-react-native` / `@lottiefiles/dotlottie-react` peer conflict:
 ```bash
 npm install <package> --legacy-peer-deps
 ```
 
+### Sentry in dev
+`enabled: !__DEV__` — Sentry is silent in development. Use `console.error` during dev. Sentry DSN is real — do not replace it.
+
 ### Bundle identifier
+`com.cawarden.ccnaquest` — set in `app.json` `ios.bundleIdentifier` and `android.package`. Do not change unless you registered a different identifier with Apple.
 
-Current: `com.cawarden.ccnaquest` in `app.json`. Change this before the first build if your Apple Developer account uses a different reverse-domain.
+### Schema version
+`SCHEMA_VERSION = 6` in `lib/store.ts`. Bump this and add a migration case in `migrate()` whenever `AppState` shape changes.
 
-### Sentry is silent in dev
-
-`enabled: !__DEV__` is intentional — Sentry only reports in production builds. Use `console.error` during development.
-
-### Design tokens
-
-All colours, spacing, and border radius come from `lib/theme.ts`. Do not hardcode values in new components.
-
----
-
-## Pending Code Work (Post-Asset Delivery)
-
-| Task                                      | Trigger                       | Effort   |
-| ----------------------------------------- | ----------------------------- | -------- |
-| Integrate `perfect.png` into `result.tsx` | Illustrator delivers asset    | 10 min   |
-| Integrate `pointing.png` into onboarding  | Illustrator delivers asset    | 10 min   |
-| Integrate `streak.png` into `index.tsx`   | Illustrator delivers asset    | 10 min   |
-| Update `app.json` icon fields             | Illustrator delivers icon PNG | 5 min    |
-| Add `privacyPolicyUrl` to `app.json`      | Legal delivers live URL       | 2 min    |
-| Implement batch 1 content corrections     | SME delivers spreadsheet      | Variable |
-| Implement batch 2 content corrections     | SME delivers spreadsheet      | Variable |
-
----
-
-## Files Reference
-
-| File                      | Purpose                                  |
-| ------------------------- | ---------------------------------------- |
-| `app/_layout.tsx`         | Root layout, Sentry init, auth redirect  |
-| `app/index.tsx`           | HomeScreen                               |
-| `app/module/[id].tsx`     | Module detail screen                     |
-| `app/section/[id].tsx`    | Section / lesson path screen             |
-| `app/quiz/[lessonId].tsx` | Quiz engine                              |
-| `app/result.tsx`          | Result screen                            |
-| `lib/store.ts`            | Zustand store, all state + actions       |
-| `lib/sm2.ts`              | SM-2 spaced repetition algorithm         |
-| `lib/theme.ts`            | Design tokens                            |
-| `lib/types.ts`            | All TypeScript interfaces                |
-| `data/modules.ts`         | Module definitions                       |
-| `data/sections/`          | Section and lesson content (37 sections) |
-| `eas.json`                | EAS build profiles                       |
-| `app.json`                | Expo app config                          |
+### Question types (active)
+`'teach' | 'mcq' | 'tf' | 'fill' | 'wordbank'` — TypeScript `never` exhaustive check in quiz renderer catches any new unhandled type at compile time.
